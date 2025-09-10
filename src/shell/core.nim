@@ -62,6 +62,12 @@ viewable vermShell:
 
   pollingDelayBuff:
     string
+  # UI state for Rendering API combobox
+  renderApiSelected:
+    int
+  # UI state for Texture Quality combobox
+  textureQualitySelected:
+    int
   fflagsErrorNotified:
     bool
 
@@ -137,8 +143,8 @@ method view(app: vermShellState): Widget =
 
           # Saves the current configuration to disk
           proc clicked() =
-            debug "shell: updated configuration file"
             app.config[].save()
+            info "shell: configuration saved"
 
         Button {.addRight.}:
           style = [ButtonFlat]
@@ -473,6 +479,7 @@ method view(app: vermShellState): Widget =
                     debug "shell: disable/enable fps cap button state: " &
                       $app.showFpsCapOpt
                     debug "shell: fps is now set to: " & $app.config[].client.fps
+
               if app.showFpsCapOpt:
                 ActionRow:
                   title = "FPS Cap"
@@ -499,6 +506,71 @@ method view(app: vermShellState): Widget =
                           app.showFpsCapBuff
                         debug "shell: " & exc.msg
 
+                        
+              ComboRow:
+                title = "Rendering API"
+                subtitle = "Choose which graphics API to prefer via FFlags."
+                items = @["Vulkan", "OpenGL", "DirectX 10", "DirectX 11"]
+                selected = app.renderApiSelected
+
+                proc select(selectedIndex: int) =
+                  # Remove existing related flags first
+                  var lines = app.config[].client.fflags.splitLines()
+                  var kept: seq[string] = @[]
+                  for l in lines:
+                    let t = l.strip()
+                    if t.len == 0: continue
+                    let eq = t.find('=')
+                    let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                    if key notin [
+                      "FFlagDebugGraphicsDisableDirect3D11",
+                      "FFlagDebugGraphicsPreferVulkan",
+                      "FFlagDebugGraphicsPreferOpenGL",
+                      "FFlagDebugGraphicsPreferD3D11FL10",
+                      "FFlagDebugGraphicsPreferD3D11"
+                    ]:
+                      kept.add(t)
+
+                  case selectedIndex
+                  of 0:
+                    kept.add("FFlagDebugGraphicsDisableDirect3D11=true")
+                    kept.add("FFlagDebugGraphicsPreferVulkan=true")
+                  of 1:
+                    kept.add("FFlagDebugGraphicsDisableDirect3D11=true")
+                    kept.add("FFlagDebugGraphicsPreferOpenGL=true")
+                  of 2:
+                    kept.add("FFlagDebugGraphicsPreferD3D11FL10=true")
+                  of 3:
+                    kept.add("FFlagDebugGraphicsPreferD3D11=true")
+                  else: discard
+
+                  app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                  app.renderApiSelected = selectedIndex
+                  debug "shell: updated rendering API FFlags"
+              ComboRow:
+                title = "Texture Quality"
+                subtitle = "Prefer a texture quality level. Automatic removes the override."
+                items = @["Automatic", "Level 0 (Lowest)", "Level 1", "Level 2", "Level 3 (Highest)"]
+                selected = app.textureQualitySelected
+
+                proc select(selectedIndex: int) =
+                  var lines = app.config[].client.fflags.splitLines()
+                  var kept: seq[string] = @[]
+                  for l in lines:
+                    let t = l.strip()
+                    if t.len == 0: continue
+                    let eq = t.find('=')
+                    let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                    if key != "DFIntTextureQualityOverride":
+                      kept.add(t)
+
+                  if selectedIndex > 0:
+                    let level = selectedIndex - 1
+                    kept.add("DFIntTextureQualityOverride=" & $level)
+
+                  app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                  app.textureQualitySelected = selectedIndex
+                  debug "shell: updated texture quality override"
               ComboRow:
                 title = "Backend"
                 subtitle =
@@ -592,6 +664,30 @@ proc initvermShell*(input: Input) {.inline.} =
         moonImgPath = config.tweaks.moon,
         pollingDelayBuff = $config.verm.pollingDelay,
         automaticApkUpdates = config.client.apkUpdates,
+        renderApiSelected = block:
+          let f = config.client.fflags.toLowerAscii()
+          if f.contains("fflagdebuggraphicsprefervulkan=true"): 0
+          elif f.contains("fflagdebuggraphicspreferopengl=true"): 1
+          elif f.contains("fflagdebuggraphicspreferd3d11fl10=true"): 2
+          elif f.contains("fflagdebuggraphicspreferd3d11=true"): 3
+          else: 0
+        ,
+        textureQualitySelected = block:
+          var sel = 0
+          for line in config.client.fflags.splitLines():
+            let t = line.strip()
+            if t.len == 0: continue
+            let eq = t.find('=')
+            if eq <= 0: continue
+            let key = t[0 ..< eq].strip()
+            if key == "DFIntTextureQualityOverride":
+              let valStr = t[eq+1 .. ^1].strip()
+              try:
+                let v = parseInt(valStr)
+                if v >= 0 and v <= 3:
+                  sel = v + 1
+              except: discard
+          sel
       )
     )
   )

@@ -11,7 +11,7 @@ Everything in here will stay open-source.
 ALL CREDITS GO TO THE OWNER OF THE ORIGINAL REPO: https://github.com/xTrayambak/lucem (Deprecated)
 
 ## <img width="512" src="src/assets/verm-title.svg">
-verm is a small wrapper over [Sober](https://sober.vinegarhq.org) to provide some QoL improvements. \
+Verm is a small wrapper over [Sober](https://sober.vinegarhq.org) to provide some QoL improvements. \
 Please keep in mind that while verm is fully open source software, Sober is proprietary for a very good reason, that being to preserve RoL from 9-year-old skiddies.
 
 ![A demo of verm's font patcher](screenshots/roblox_fonts.png)
