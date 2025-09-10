@@ -24,6 +24,8 @@ Here are some issues i have solved: \
 **Added FFlag entry validation** \
 **Server Region Indicator not working** 
 
+![A demo of verm demonstrating Discord rich presence and a notification saying where the server is located](screenshots/Bloxstrap.webp)
+
 # Features added
 **All Bloxstrap Engine Tweaks** 
 
