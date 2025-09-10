@@ -1,7 +1,7 @@
 # Notice
 As of *8th of May, 2025*: Lucem is now **officially deprecated**. No updates will henceforth be released. 
 
-## <img width="512" src="src/assets/verm-title.svg">
+#
 
 This is why Verm was created.\
 Verm is a fork of Lucem, and i am constantly updating it to keep it working.\
