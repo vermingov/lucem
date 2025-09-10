@@ -22,10 +22,10 @@ Please keep in mind that while verm is fully open source software, Sober is prop
 I have adressed and fixed alot of the issues the original has. \
 Here are some issues i have solved: \
 **Added FFlag entry validation** \
-**Server Region Indicator not working** \
+**Server Region Indicator not working** 
 
 # Features added
-**All Bloxstrap Engine Tweaks** \
+**All Bloxstrap Engine Tweaks** 
 
 
 ## Disclaimer, in big bold letters.
