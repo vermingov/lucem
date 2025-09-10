@@ -17,7 +17,6 @@ Commands:
   run                       Run Sober
   meta                      Get build metadata
   list-gpus                 List all GPUs on this system
-  update                    Check for verm updates and install them
   edit-config               Edit the configuration file
   clear-cache               Clear the API caches that verm maintains
   shell                     Launch the verm configuration GUI
@@ -96,8 +95,6 @@ proc main() {.inline.} =
     initializeSober(input)
     createvermDesktopFile()
     installSystemdService()
-  of "update":
-    updateverm()
   of "check-for-updates":
     runUpdateChecker(parseConfig(input))
   of "install-systemd-service":
