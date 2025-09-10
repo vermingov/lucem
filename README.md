@@ -18,9 +18,15 @@ Please keep in mind that while verm is fully open source software, Sober is prop
 ![A demo of verm's font patcher](screenshots/roblox_fonts.png)
 ![A demo of verm demonstrating Discord rich presence and a notification saying where the server is located](screenshots/demo.webp)
 
-## Contact/Support
-You can open issues for bugs. \
-We now have a Discord server! You can join it [here](https://discord.gg/Z5m3n9fjcU)
+# Why choose this fork over the original?
+I have adressed and fixed alot of the issues the original has. \
+Here are some issues i have solved: \
+**Added FFlag entry validation** \
+**Server Region Indicator not working** \
+
+# Features added
+**All Bloxstrap Engine Tweaks** \
+
 
 ## Disclaimer, in big bold letters.
 verm does not allow you to bypass the (reasonable and justified) restrictions the Vinegar team has put on Sober's ability to load APKs that are modified.
