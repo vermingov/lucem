@@ -100,7 +100,7 @@ Debian ships an old version of Nim that is not compatible with verm, install Nim
 #### NixOS
 There's no Nix flake yet.
 ```command
-$ git clone https://github.com/xTrayambak/verm
+$ git clone https://github.com/vermingov/lucem
 $ cd verm
 $ nix-shell
 ```
@@ -109,7 +109,7 @@ The package names are similar for other distributions.
 
 Run the following command to compile verm.
 ```command
-$ nimble install https://github.com/xTrayambak/verm
+$ nimble install https://github.com/vermingov/lucem
 ```
 
 ## Submitting bug reports

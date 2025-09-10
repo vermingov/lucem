@@ -23,7 +23,7 @@ type
     tarball_url*, zipball_url*: string
 
 const
-  vermReleaseUrl {.strdefine.} = "https://api.github.com/repos/xTrayambak/verm/releases/latest"
+  vermReleaseUrl {.strdefine.} = "https://api.github.com/repos/vermingov/lucem/releases/latest"
 
 proc getLatestRelease*(): Option[vermRelease] {.inline.} =
   debug "verm: auto-updater: fetching latest release"
@@ -127,7 +127,7 @@ proc updateverm* =
       quit(1)
     
     info "verm: cloning source code"
-    if (let code = execCmd(git & " clone https://github.com/xTrayambak/verm.git " & tmpDir); code != 0):
+    if (let code = execCmd(git & " clone https://github.com/vermingov/lucem.git " & tmpDir); code != 0):
       error "verm: git exited with non-zero exit code: " & $code
       quit(1)
 
