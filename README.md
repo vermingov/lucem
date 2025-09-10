@@ -1,13 +1,12 @@
 # Notice
-As of *8th of May, 2025*: verm is now **officially deprecated**. No updates will henceforth be released. 
+As of *8th of May, 2025*: Lucem is now **officially deprecated**. No updates will henceforth be released. 
 
-We are now shifting over to [Equinox](https://github.com/equinoxhq/equinox) which is an independent, open source runtime for Roblox on Linux.
+This is why Verm was created.
+Verm is a fork of Lucem, and i am constantly updating it to keep it working.
+I will also be adding new features every now and then.
+Everything in here will stay open-source.
 
-Thanks for using verm. This was the first time a lot of people used software I wrote, and I'm quite happy for that. I learnt quite a few things along the way.
-
-We hope to see you over there as we (aim to) make a viable alternative to Sober. :^)
-
-(tunis can finally take a rest)
+ALL CREDITS GO TO THE OWNER OF THE ORIGINAL REPO: https://github.com/xTrayambak/lucem (Deprecated)
 
 ## <img width="512" src="src/assets/verm-title.svg">
 verm is a small wrapper over [Sober](https://sober.vinegarhq.org) to provide some QoL improvements. \
@@ -15,10 +14,6 @@ Please keep in mind that while verm is fully open source software, Sober is prop
 
 ![A demo of verm's font patcher](screenshots/roblox_fonts.png)
 ![A demo of verm demonstrating Discord rich presence and a notification saying where the server is located](screenshots/demo.webp)
-![A demo of verm's nice looking GTK4 based settings menu](screenshots/settings_gui_1.webp)
-![A demo of verm's nice looking GTK4 based FFlag editor](screenshots/settings_gui_2.webp)
-![A demo of verm's nice looking GTK4 based settings menu](screenshots/settings_gui_3.webp)
-![A demo of verm's nice looking GTK4 based settings menu](screenshots/settings_gui_4.webp)
 
 ## Contact/Support
 You can open issues for bugs. \
@@ -28,8 +23,8 @@ We now have a Discord server! You can join it [here](https://discord.gg/Z5m3n9fj
 verm does not allow you to bypass the (reasonable and justified) restrictions the Vinegar team has put on Sober's ability to load APKs that are modified.
 
 If you really cheat on Roblox, I'd say you should reconsider your life decisions than anything. \
-**verm is not associated with the VinegarHQ team or Roblox, nor is it endorsed by them!**
-
+**Verm is not associated with the VinegarHQ team or Roblox, nor is it endorsed by them!**
+ 
 ## Features
 - GTK4 + Libadwaita GUI to modify settings
 - GTK4-based FFlag editor that is easy to use

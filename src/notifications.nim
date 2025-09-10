@@ -44,21 +44,22 @@ proc notify*(
   icon: Option[string] = none(string)
 ) =
   var worker = findExe("verm_overlay")
-  if getEnv("XDG_CURRENT_DESKTOP") == "GNOME" or (defined(release) and worker.len < 1):
-    warn "notifications: we're either on GNOME or the verm overlay binary is missing, something went horribly wrong!"
-    notifyFallback(heading, description, expireTime, icon)
-    return
-  
-  let pid = fork()
-
   if worker.len < 1 and not defined(release):
     worker = "./verm_overlay"
 
-  if pid == 0:
-    let cmd = worker & " --heading:\"" & heading.encode() & "\" --description:\"" & description.encode() & "\" --expire-time:" & $(expireTime.int / 1000) & ' ' & (if *icon: "--icon:" & &icon else: "")
-    debug "notifications: executing command: " & cmd
-    discard execCmd(cmd)
-    quit(0)
+  var usedOverlay = false
+  if worker.len > 0:
+    let pid = fork()
+    if pid == 0:
+      let cmd = worker & " --heading:\"" & heading.encode() & "\" --description:\"" & description.encode() & "\" --expire-time:" & $(expireTime.int / 1000) & ' ' & (if *icon: "--icon:" & &icon else: "")
+      debug "notifications: executing command: " & cmd
+      discard execCmd(cmd)
+      quit(0)
+    usedOverlay = true
+
+  if not usedOverlay:
+    warn "notifications: overlay not available; using notify-send fallback."
+    notifyFallback(heading, description, expireTime, icon)
 
 proc presentUpdateAlert*(
   heading: string,
@@ -66,23 +67,22 @@ proc presentUpdateAlert*(
   blocks: bool = false
 ) =
   var worker = findExe("verm_overlay")
-  if getEnv("XDG_CURRENT_DESKTOP") == "GNOME" or (defined(release) and worker.len < 1):
-    warn "notifications: we're either on GNOME or the verm overlay binary is missing, something went horribly wrong!"
-    notifyFallback(heading, message, 240000)
-    return
-
-  let pid = if not blocks:
-    debug "notifications: blocks = false, forking process"
-    fork()
-  else:
-    debug "notifications: blocks = true, billions must hang up"
-    0
-
   if worker.len < 1 and not defined(release):
     worker = "./verm_overlay"
 
-  if pid == 0:
-    let cmd = worker & " --update-alert --update-heading:\"" & heading.encode() & "\" --update-message:\"" & message.encode() & '"'
-    debug "notifications: executing command: " & cmd
-    discard execCmd(cmd)
-    quit(0)
+  if worker.len > 0:
+    let pid = if not blocks:
+      debug "notifications: blocks = false, forking process"
+      fork()
+    else:
+      debug "notifications: blocks = true, billions must hang up"
+      0
+
+    if pid == 0:
+      let cmd = worker & " --update-alert --update-heading:\"" & heading.encode() & "\" --update-message:\"" & message.encode() & '"'
+      debug "notifications: executing command: " & cmd
+      discard execCmd(cmd)
+      quit(0)
+  else:
+    warn "notifications: overlay not available; using notify-send fallback."
+    notifyFallback(heading, message, 240000)

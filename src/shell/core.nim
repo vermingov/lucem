@@ -62,22 +62,27 @@ viewable vermShell:
 
   pollingDelayBuff:
     string
+  fflagsErrorNotified:
+    bool
 
 # This method builds and returns the main GUI for the verm shell, handling all state and user interactions.
 method view(app: vermShellState): Widget =
   var parsedFflags: SoberFFlags
   try:
     parseFflags(app.config[], parsedFflags)
+    # If parsing succeeds, clear the error notification guard
+    app.fflagsErrorNotified = false
   except FFlagParseError as exc:
     warn "shell: failed to parse fflags: " & exc.msg
-    notify("Failed to parse FFlags", exc.msg)
+    # Do not use overlay; just revert and continue silently
+    app.fflagsErrorNotified = true
     debug "shell: reverting to previous state"
     app.config[].client.fflags = app.prevFflagBuff
     app.currFflagBuff = app.prevFflagBuff
 
   result = gui:
     Window:
-      title = "verm"
+      title = "Verm Sober Client"
       defaultSize = (860, 640)
 
       AdwHeaderBar {.addTitlebar.}:
@@ -333,21 +338,51 @@ method view(app: vermShellState): Widget =
                       app.currFflagBuff = text
                       debug "shell: fflag entry mutated: " & app.currFflagBuff
 
-                    # Adds the FFlag entry to the config (no validation yet)
+                    # Adds the FFlag entry to the config with validation
                     proc activate() =
                       debug "shell: fflag entry: " & app.currFflagBuff
 
-                      # TODO: add validation
-                      app.config.client.fflags &= '\n' & app.currFflagBuff
+                      # Validation: must be in the form key=value, and value must be a valid JSON value
+                      let entry = app.currFflagBuff.strip()
+                      let eqIdx = entry.find('=')
+                      if eqIdx == -1 or eqIdx == 0 or eqIdx == entry.len - 1:
+                        warn "shell: invalid fflag format; expected key=value"
+                        return
+
+                      let key = entry[0 ..< eqIdx].strip()
+                      let value = entry[eqIdx+1 .. ^1].strip()
+
+                      # Try to parse value as JSON (to allow numbers, bools, strings, etc)
+                      try:
+                        discard parseJson(value)
+                      except CatchableError:
+                        warn "shell: invalid fflag value; must be valid JSON literal"
+                        return
+
+                      app.config.client.fflags &= '\n' & entry
 
                   Button {.expand: false.}:
                     icon = "list-add-symbolic"
                     style = [ButtonSuggested]
 
-                    # Adds the FFlag entry to the config (no validation yet)
+                    # Adds the FFlag entry to the config with validation
                     proc clicked() =
-                      # TODO: add validation
-                      app.config[].client.fflags &= '\n' & app.currFflagBuff
+                      let entry = app.currFflagBuff.strip()
+                      let eqIdx = entry.find('=')
+                      if eqIdx == -1 or eqIdx == 0 or eqIdx == entry.len - 1:
+                        warn "shell: invalid fflag format; expected key=value"
+                        return
+
+                      let key = entry[0 ..< eqIdx].strip()
+                      let value = entry[eqIdx+1 .. ^1].strip()
+
+                      try:
+                        discard parseJson(value)
+                      except CatchableError:
+                        warn "shell: invalid fflag value; must be valid JSON literal"
+                        return
+
+                      app.config[].client.fflags &= '\n' & entry
 
                       debug "shell: fflag entry: " & app.currFflagBuff
 

@@ -5,6 +5,8 @@ import std/[os, osproc, logging, strutils, importutils, base64, times]
 import ./[argparser, sugar, config, internal_fonts]
 import pkg/[siwin, opengl, nanovg, colored_logger, vmath]
 import pkg/siwin/platforms/wayland/[window, windowOpengl]
+import ./fflags
+import ./sober_config
 
 privateAccess(WindowWaylandOpengl)
 privateAccess(WindowWaylandObj)
@@ -47,6 +49,7 @@ type
 
     lastEpoch*: float
     timeSpent*: float
+    lastLogSecond*: int
 
     headingFont*: Font
 
@@ -130,6 +133,18 @@ proc initOverlay*(input: Input) {.noReturn.} =
   debug "overlay: got all arguments, parsing config"
   var config = parseConfig(input)
 
+  # If a non-update overlay was requested with zero/invalid expire-time, clamp to 4 seconds
+  if overlay.state == osOverlay and (overlay.expireTime <= 0f or overlay.expireTime.isNaN):
+    overlay.expireTime = 4f
+
+  # Validate FFlags before proceeding
+  try:
+    var parsedFflags: SoberFFlags
+    parseFFlags(config, parsedFflags)
+  except FFlagParseError as exc:
+    error "overlay: failed to parse FFlags: " & exc.msg
+    quit(1)
+
   debug "overlay: creating surface"
   overlay.size = ivec2(config.overlay.width.int32, config.overlay.height.int32)
   overlay.wl = newOpenglWindowWayland(
@@ -180,13 +195,20 @@ proc initOverlay*(input: Input) {.noReturn.} =
   )
   overlay.lastEpoch = epochTime()
   overlay.timeSpent = 0f
+  overlay.lastLogSecond = -1
 
   overlay.wl.eventsHandler.onRender = proc(event: RenderEvent) =
+    if overlay.closed: return
     overlay.draw()
 
   overlay.wl.eventsHandler.onTick = proc(event: TickEvent) =
+    if overlay.closed: return
+    if overlay.expireTime == 0f and overlay.state == osOverlay:
+      # For safety, never let regular overlays be infinite
+      overlay.expireTime = 4f
+
     if overlay.expireTime == 0f:
-      return # Infinite alert
+      return # Infinite alert only allowed for update-alert
 
     let epoch = epochTime()
     let elapsed = epoch - overlay.lastEpoch
@@ -194,22 +216,32 @@ proc initOverlay*(input: Input) {.noReturn.} =
     overlay.timeSpent += elapsed
     overlay.lastEpoch = epoch
 
-    debug "overlay: " & $overlay.timeSpent & "s / " & $overlay.expireTime & 's'
+    # Throttle debug logging to once per second to avoid spamming
+    let currentSec = int(floor(overlay.timeSpent))
+    if currentSec != overlay.lastLogSecond:
+      debug "overlay: " & $overlay.timeSpent & "s / " & $overlay.expireTime & 's'
+      overlay.lastLogSecond = currentSec
 
     if overlay.timeSpent >= overlay.expireTime:
       info "overlay: Completed lifetime. Closing!"
+      overlay.closed = true
       overlay.wl.close()
 
   overlay.wl.eventsHandler.onKey = proc(event: KeyEvent) =
+    if overlay.closed: return
     if overlay.state == osUpdateAlert:
       case event.key
       of enter:
         overlay.description = "verm is updating itself. Please wait."
         discard execCmd(findExe("verm") & " update")
         overlay.description = "Done!"
+        overlay.closed = true
         overlay.wl.close()
-      else: overlay.wl.close()
+      else:
+        overlay.closed = true
+        overlay.wl.close()
     else:
+      overlay.closed = true
       overlay.wl.close()
 
   overlay.wl.run()
@@ -217,6 +249,7 @@ proc initOverlay*(input: Input) {.noReturn.} =
 
 proc main =
   addHandler(newColoredLogger())
+  setLogFilter(lvlInfo) # Suppress debug logs by default to avoid console spam
   let input = parseInput()
 
   initOverlay(input)

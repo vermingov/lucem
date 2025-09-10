@@ -63,8 +63,9 @@ proc onGameJoined*(daemon: var Daemon, data: string) =
   info "  Verified: " & $data.creator.hasVerifiedBadge
 
 proc onServerIPRevealed*(daemon: var Daemon, ipAddr: string) =
-  #[if not daemon.config.verm.notifyServerRegion:
-    return]#
+  if not daemon.config.verm.notifyServerRegion:
+    debug "verm: notifyServerRegion is disabled; skipping location notification."
+    return
 
   debug "verm: server IP is: " & ipAddr
 
