@@ -1,8 +1,30 @@
 ## Flatpak helper
 ## Copyright (C) 2024 Trayambak Rai
 
-import std/[os, osproc, posix, logging, strutils]
+import std/[os, osproc, posix, logging, strutils, times]
 import ./[config, common]
+proc runCmdExitCodeTimeout(cmd: string, timeoutMs: int): int {.inline.} =
+  try:
+    var p = startProcess(
+      command = "/bin/sh",
+      args = @["-lc", cmd],
+      options = {poUsePath, poStdErrToStdOut}
+    )
+    let startT = epochTime()
+    while p.running:
+      if int((epochTime() - startT) * 1000).int >= timeoutMs:
+        try: p.terminate()
+        except CatchableError: discard
+        try: p.kill()
+        except CatchableError: discard
+        return -9999
+      sleep(10)
+    return p.waitForExit()
+  except CatchableError as exc:
+    warn "flatpak: command failed ('" & cmd & "'): " & exc.msg
+    return -1
+
+## simplified bounded runner: returns only exit code
 
 proc flatpakInstall*(id: string, user: bool = true): bool {.inline, discardable.} =
   if findExe("flatpak").len < 1:
@@ -10,26 +32,27 @@ proc flatpakInstall*(id: string, user: bool = true): bool {.inline, discardable.
 
   # If Sober is already installed, skip reinstallation
   let infoCmd = (if user: "flatpak info --user " else: "flatpak info ") & SOBER_APP_ID
-  if execCmd(infoCmd) == 0:
+  if runCmdExitCodeTimeout(infoCmd, 10000) == 0:
     info "flatpak: '" & SOBER_APP_ID & "' is already installed; skipping install."
     return true
 
   info "flatpak: install package \"" & id & '"'
-  let (output, exitCode) =
-    execCmdEx("flatpak install --assumeyes " & id & (if user: " --user" else: ""))
+  let exitCode = runCmdExitCodeTimeout("flatpak install --assumeyes " & id & (if user: " --user" else: ""), 60000)
 
-  if exitCode != 0 and not output.contains("is already installed"):
+  if exitCode != 0:
     error "flatpak: failed to install package \"" & id &
       "\"; flatpak process exited with abnormal exit code " & $exitCode
-    error "flatpak: it also outputted the following:"
-    error output
     false
   else:
     info "flatpak: successfully installed \"" & id & "\"!"
     true
 
 proc soberRunning*(): bool {.inline.} =
-  execCmd("flatpak ps | grep -q " & SOBER_APP_ID) == 0
+  let code = runCmdExitCodeTimeout("flatpak ps | grep -q " & SOBER_APP_ID, 2000)
+  if code == -9999:
+    # On timeout, assume still running to avoid premature shutdowns
+    return true
+  code == 0
 
 proc flatpakRun*(
   id: string, path: string = "/dev/stdout", launcher: string = "",
@@ -86,4 +109,4 @@ proc flatpakRun*(
 
 proc flatpakKill*(id: string): bool {.inline, discardable.} =
   info "flatpak: killing flatpak app \"" & id & '"'
-  bool(execCmd("flatpak kill " & id))
+  runCmdExitCodeTimeout("flatpak kill " & id, 5000) == 0

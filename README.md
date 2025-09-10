@@ -21,7 +21,6 @@ Please keep in mind that while verm is fully open source software, Sober is prop
 # Why choose this fork over the original?
 I have adressed and fixed alot of the issues the original has. \
 Here are some issues i have solved: \
-**Added FFlag entry validation** \
 **stdout/stderr redirection is guarded;** \
 **failure falls back to /dev/null (prevents child attaching to terminal pipes and blocking).** \
 **Sober liveness detection now uses flatpak ps (more reliable than pidof in sandboxed setups).** \
@@ -37,7 +36,7 @@ Here are some issues i have solved: \
 
 
 ## Disclaimer, in big bold letters.
-verm does not allow you to bypass the (reasonable and justified) restrictions the Vinegar team has put on Sober's ability to load APKs that are modified.
+Verm does not allow you to bypass the (reasonable and justified) restrictions the Vinegar team has put on Sober's ability to load APKs that are modified.
 
 If you really cheat on Roblox, I'd say you should reconsider your life decisions than anything. \
 **Verm is not associated with the VinegarHQ team or Roblox, nor is it endorsed by them!**
