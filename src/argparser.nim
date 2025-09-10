@@ -1,4 +1,4 @@
-## Argument parser for Lucem, based on `std/parseopt`
+## Argument parser for verm, based on `std/parseopt`
 ## Copyright (C) 2024 Trayambak Rai
 import std/[os, parseopt, logging, tables, strutils]
 import ./[sugar]
@@ -51,8 +51,8 @@ proc parseInput*(): Input {.inline.} =
         debug "argparser: found argument: " & parser.key
         input.arguments &= parser.key
 
-  if input.command.len < 1 and not getAppFilename().contains("lucemd") and not getAppFilename().contains("lucem_overlay"): # lucemd and lucem_overlay don't need a command
-    error "lucem: expected command, got none. Run `lucem help` for more information."
+  if input.command.len < 1 and not getAppFilename().contains("vermd") and not getAppFilename().contains("verm_overlay"): # vermd and verm_overlay don't need a command
+    error "verm: expected command, got none. Run `verm help` for more information."
     quit(1)
 
   input

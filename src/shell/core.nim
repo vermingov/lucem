@@ -1,4 +1,4 @@
-## Lucem shell
+## verm shell
 ## "soon:tm:" - tray
 ## Copyright (C) 2024 Trayambak Rai
 import std/[os, strutils, json, logging, posix, tables, osproc]
@@ -8,11 +8,11 @@ import
 
 type ShellState* {.pure.} = enum
   Client
-  Lucem
+  verm
   Tweaks
   FflagEditor
 
-viewable LucemShell:
+viewable vermShell:
   state:
     ShellState = Client
   config:
@@ -63,7 +63,7 @@ viewable LucemShell:
   pollingDelayBuff:
     string
 
-method view(app: LucemShellState): Widget =
+method view(app: vermShellState): Widget =
   var parsedFflags: SoberFFlags
   try:
     parseFflags(app.config[], parsedFflags)
@@ -76,7 +76,7 @@ method view(app: LucemShellState): Widget =
 
   result = gui:
     Window:
-      title = "Lucem"
+      title = "verm"
       defaultSize = (860, 640)
 
       AdwHeaderBar {.addTitlebar.}:
@@ -88,10 +88,10 @@ method view(app: LucemShellState): Widget =
           sensitive = true
           #icon = "view-list-bullet-rtl-symbolic"
           text = "Features"
-          tooltip = "The features provided by Lucem"
+          tooltip = "The features provided by verm"
 
           proc clicked() =
-            app.state = ShellState.Lucem
+            app.state = ShellState.verm
 
         Button {.addLeft.}:
           sensitive = true
@@ -132,25 +132,25 @@ method view(app: LucemShellState): Widget =
         Button {.addRight.}:
           style = [ButtonFlat]
           icon = "bookmark-new-symbolic"
-          tooltip = "Add desktop entries for Lucem"
+          tooltip = "Add desktop entries for verm"
 
           proc clicked() =
             debug "shell: created .desktop files"
-            createLucemDesktopFile()
+            createvermDesktopFile()
 
         Button {.addRight.}:
           style = [ButtonFlat]
           icon = "input-gaming-symbolic"
-          tooltip = "Save configuration and launch Sober through Lucem"
+          tooltip = "Save configuration and launch Sober through verm"
 
           proc clicked() =
-            debug "shell: save config, exit config editor and launch lucem"
+            debug "shell: save config, exit config editor and launch verm"
             app.config[].save()
             app.scheduleCloseWindow()
 
             if fork() == 0:
-              debug "shell: we are the child - launching `lucem run`"
-              quit(execCmd("lucem run"))
+              debug "shell: we are the child - launching `verm run`"
+              quit(execCmd("verm run"))
             else:
               debug "shell: we are the parent - quitting"
               quit(0)
@@ -244,14 +244,14 @@ method view(app: LucemShellState): Widget =
                     app.config[].tweaks.moon = path
                     debug "shell: custom moon texture path is set to: " & app.sunImgPath
 
-        of ShellState.Lucem:
+        of ShellState.verm:
           PreferencesPage:
 
             PreferencesGroup:
               sizeRequest = (760, 560)
-              title = "Lucem Settings"
+              title = "verm Settings"
               description =
-                "These are settings to tweak the features that Lucem provides."
+                "These are settings to tweak the features that verm provides."
 
               ActionRow:
                 title = "Discord Rich Presence"
@@ -262,10 +262,10 @@ method view(app: LucemShellState): Widget =
 
                   proc changed(state: bool) =
                     app.discordRpcOpt = not app.discordRpcOpt
-                    app.config[].lucem.discordRpc = app.discordRpcOpt
+                    app.config[].verm.discordRpc = app.discordRpcOpt
 
                     debug "shell: discord rpc option state: " &
-                      $app.config[].lucem.discordRpc
+                      $app.config[].verm.discordRpc
 
               ActionRow:
                 title = "Notify the Server Region"
@@ -276,15 +276,15 @@ method view(app: LucemShellState): Widget =
 
                   proc changed(state: bool) =
                     app.serverLocationOpt = not app.serverLocationOpt
-                    app.config[].lucem.notifyServerRegion = app.serverLocationOpt
+                    app.config[].verm.notifyServerRegion = app.serverLocationOpt
 
                     debug "shell: notify server region option state: " &
-                      $app.config[].lucem.notifyServerRegion
+                      $app.config[].verm.notifyServerRegion
 
               ActionRow:
                 title = "Clear all API caches"
                 subtitle =
-                  "This will clear all the API call caches. Some features might be slower the next time you run Lucem."
+                  "This will clear all the API call caches. Some features might be slower the next time you run verm."
                 Button {.addSuffix.}:
                   icon = "user-trash-symbolic"
                   style = [ButtonDestructive]
@@ -460,7 +460,7 @@ method view(app: LucemShellState): Widget =
               ActionRow:
                 title = "Launcher"
                 subtitle =
-                  "Lucem will launch Sober with a specified command. This is optional."
+                  "verm will launch Sober with a specified command. This is optional."
                 Entry {.addSuffix.}:
                   text = app.launcherBuff
                   placeholder = "e.g. gamemoderun"
@@ -488,7 +488,7 @@ method view(app: LucemShellState): Widget =
 
                   proc activate() =
                     try:
-                      app.config[].lucem.pollingDelay = app.pollingDelayBuff.parseUint()
+                      app.config[].verm.pollingDelay = app.pollingDelayBuff.parseUint()
                       debug "shell: polling delay is set to: " & app.pollingDelayBuff
                     except ValueError as exc:
                       warn "shell: failed to parse polling delay (" & app.pollingDelayBuff &
@@ -505,32 +505,32 @@ method view(app: LucemShellState): Widget =
                     app.automaticApkUpdates = state
                     app.config[].client.apkUpdates = state
 
-proc initLucemShell*(input: Input) {.inline.} =
+proc initvermShell*(input: Input) {.inline.} =
   info "shell: initializing GTK4 shell"
   info "shell: libadwaita version: v" & $AdwVersion[0] & '.' & $AdwVersion[1]
   var config = parseConfig(input)
 
   adw.brew(
     gui(
-      LucemShell(
+      vermShell(
         config = addr(config),
-        state = ShellState.Lucem,
+        state = ShellState.verm,
         showFpsCapOpt = config.client.fps != 60,
         showFpsCapBuff = $config.client.fps,
-        discordRpcOpt = config.lucem.discordRpc,
+        discordRpcOpt = config.verm.discordRpc,
         telemetryOpt = config.client.telemetry,
         launcherBuff = config.client.launcher,
-        serverLocationOpt = config.lucem.notifyServerRegion,
+        serverLocationOpt = config.verm.notifyServerRegion,
         customFontPath = config.tweaks.font,
         oldOofSound = config.tweaks.oldOof,
         sunImgPath = config.tweaks.sun,
         moonImgPath = config.tweaks.moon,
-        pollingDelayBuff = $config.lucem.pollingDelay,
+        pollingDelayBuff = $config.verm.pollingDelay,
         automaticApkUpdates = config.client.apkUpdates,
       )
     )
   )
 
-  info "lucem: saving configuration changes"
+  info "verm: saving configuration changes"
   config.save()
-  info "lucem: done!"
+  info "verm: done!"

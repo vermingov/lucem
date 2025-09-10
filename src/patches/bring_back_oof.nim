@@ -4,7 +4,7 @@ import std/[os, logging, strutils]
 import ../[http, common]
 
 const
-  LucemPatchOofSoundUrl* {.strdefine.} =
+  vermPatchOofSoundUrl* {.strdefine.} =
     "https://github.com/pizzaboxer/bloxstrap/raw/main/Bloxstrap/Resources/Mods/Sounds/OldDeath.ogg"
   SoberSoundResourcesPath* {.strdefine.} =
     "$1/.var/app/" & SOBER_APP_ID & "/data/sober/assets/content/sounds/"
@@ -24,7 +24,7 @@ proc enableOldOofSound*(enable: bool = true) =
 
       if not fileExists(oldFp):
         debug "patches: fetching old oof sound"
-        let oldSound = httpGet(LucemPatchOofSoundUrl)
+        let oldSound = httpGet(vermPatchOofSoundUrl)
         writeFile(usedFp, oldSound)
       else:
         debug "patches: old sound is already downloaded, simply moving it instead."

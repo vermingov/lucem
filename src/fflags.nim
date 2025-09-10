@@ -12,7 +12,7 @@ proc parseFFlags*(config: Config, fflags: var SoberFFlags) =
 
       if splitted.len < 2:
         if flag.len > 0:
-          error "lucem: error whilst parsing FFlag (" & flag &
+          error "verm: error whilst parsing FFlag (" & flag &
             "): only got key, no value to complete the pair was found."
           raise newException(
             FFlagParseError,
@@ -23,7 +23,7 @@ proc parseFFlags*(config: Config, fflags: var SoberFFlags) =
           continue
 
       if splitted.len > 2:
-        error "lucem: error whilst parsing FFlag (" & flag &
+        error "verm: error whilst parsing FFlag (" & flag &
           "): got more than two splits, key and value were already found."
         raise newException(
           FFlagParseError,

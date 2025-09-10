@@ -24,22 +24,22 @@ proc explainCommand*(question: Question) =
   case question.command
   of "run":
     stdout.styledWriteLine(
-      repeat(' ', int(terminalWidth() / 2)), "lucem ", fgGreen, "run", resetStyle
+      repeat(' ', int(terminalWidth() / 2)), "verm ", fgGreen, "run", resetStyle
     )
     stdout.styledWriteLine(styleBright, "NAME", resetStyle)
     stdout.write("\trun - run the Roblox client\n\n")
     stdout.styledWriteLine(styleBright, "DESCRIPTION", resetStyle)
     stdout.styledWriteLine(
-      "\tThis command runs the Roblox client alongside Lucem's event watcher thread."
+      "\tThis command runs the Roblox client alongside verm's event watcher thread."
     )
   else:
-    error "lucem: no documentation exists for command \"" & question.command & '"'
+    error "verm: no documentation exists for command \"" & question.command & '"'
     quit(1)
 
 proc explainConfig*(question: Question) =
   assert question.kind == Configuration
   template noDocs() {.dirty.} =
-    error "lucem: no documentation exists for " & question.category & ':' & question.name
+    error "verm: no documentation exists for " & question.category & ':' & question.name
     quit(1)
 
   case question.category
@@ -49,13 +49,13 @@ proc explainConfig*(question: Question) =
       "this category is now deprecated and serves no purpose.", resetStyle,
     )
     return
-  of "lucem":
+  of "verm":
     case question.name
     of "discord_rpc":
       stdout.styledWriteLine(
         repeat(' ', int(terminalWidth() / 2)),
         fgGreen,
-        "lucem",
+        "verm",
         resetStyle,
         ":",
         fgYellow,
@@ -74,13 +74,13 @@ proc explainConfig*(question: Question) =
       stdout.styledWriteLine(styleBright, "DESCRIPTION", resetStyle)
       stdout.styledWriteLine(
         "\t", "When set to ", fgBlue, "true", resetStyle,
-        ", Lucem will show the Roblox game you're currently playing via Discord's rich presence system.",
+        ", verm will show the Roblox game you're currently playing via Discord's rich presence system.",
       )
     of "notify_server_region":
       stdout.styledWriteLine(
         repeat(' ', int(terminalWidth() / 2)),
         fgGreen,
-        "lucem",
+        "verm",
         resetStyle,
         ":",
         fgYellow,
@@ -99,20 +99,20 @@ proc explainConfig*(question: Question) =
       stdout.styledWriteLine(styleBright, "DESCRIPTION", resetStyle)
       stdout.styledWriteLine(
         "\t", "When set to ", fgBlue, "true", resetStyle,
-        ", Lucem will show you the location of the server you're connected to.",
+        ", verm will show you the location of the server you're connected to.",
       )
       stdout.write '\n'
 
       stdout.styledWriteLine(styleBright, "PRIVACY", resetStyle)
       stdout.styledWriteLine(
         "\t",
-        "Lucem makes an API call to ipinfo.io, who may or may not store your IP address for telemetry (we can never be sure). Lucem never contacts any other server other than that of ipinfo's when the location is being fetched. Subsequent API calls are omitted if the IP is found in the local cache that Lucem maintains to save on bandwidth.",
+        "verm makes an API call to ipinfo.io, who may or may not store your IP address for telemetry (we can never be sure). verm never contacts any other server other than that of ipinfo's when the location is being fetched. Subsequent API calls are omitted if the IP is found in the local cache that verm maintains to save on bandwidth.",
       )
     of "loading_screen":
       stdout.styledWriteLine(
         repeat(' ', int(terminalWidth() / 2)),
         fgGreen,
-        "lucem",
+        "verm",
         resetStyle,
         ":",
         fgYellow,
@@ -131,14 +131,14 @@ proc explainConfig*(question: Question) =
       stdout.styledWriteLine(styleBright, "DESCRIPTION", resetStyle)
       stdout.styledWriteLine(
         "\t", "When set to ", fgBlue, "true", resetStyle,
-        ", Lucem will show a loading screen when Sober is initializing Roblox.",
+        ", verm will show a loading screen when Sober is initializing Roblox.",
       )
       stdout.write '\n'
     of "polling_delay":
       stdout.styledWriteLine(
         repeat(' ', int(terminalWidth() / 2)),
         fgGreen,
-        "lucem",
+        "verm",
         resetStyle,
         ":",
         fgYellow,
@@ -157,7 +157,7 @@ proc explainConfig*(question: Question) =
       stdout.styledWriteLine(styleBright, "DESCRIPTION", resetStyle)
       stdout.styledWriteLine(
         "\t",
-        "This value dictates how much time Lucem's event watcher thread sleeps for after polling Sober's log file, in seconds. This barely impacts performance even when set to zero, this simply exists to allow people with ",
+        "This value dictates how much time verm's event watcher thread sleeps for after polling Sober's log file, in seconds. This barely impacts performance even when set to zero, this simply exists to allow people with ",
         styleItalic, "very", resetStyle, " weak CPUs to save on resources.",
       )
     else:
@@ -341,7 +341,7 @@ proc explainConfig*(question: Question) =
 
       stdout.styledWriteLine(styleBright, "DEFAULT VALUE", resetStyle)
       stdout.styledWriteLine(
-        "\t", fgGreen, "Autodetected by Lucem using the ", resetStyle, styleBright,
+        "\t", fgGreen, "Autodetected by verm using the ", resetStyle, styleBright,
         "XDG_SESSION_TYPE", resetStyle, fgGreen, " environment variable.", resetStyle,
       )
       stdout.write '\n'
@@ -350,7 +350,7 @@ proc explainConfig*(question: Question) =
       stdout.styledWriteLine(
         "\t",
         "This setting lets you force Roblox (Sober) to either run with the Wayland windowing backend or the X11 windowing backend.",
-        "\n\tIf you leave this empty, Lucem automatically detects which backend would be the best for you.",
+        "\n\tIf you leave this empty, verm automatically detects which backend would be the best for you.",
         "\n\tValid options are:\n", fgRed, "\t-", resetStyle, styleBright, " x11\n",
         resetStyle, fgRed, "\t-", resetStyle, styleBright, " wayland\n", resetStyle,
       )
@@ -409,7 +409,7 @@ proc explainConfig*(question: Question) =
         " ", fgGreen, "FFlagName", resetStyle, styleBright, "=", resetStyle, fgGreen,
         "1337", resetStyle, fgRed, "-", resetStyle, " ", fgGreen, "FFlagName",
         resetStyle, styleBright, "=", resetStyle, fgBlue, "false", resetStyle,
-        "If you do not understand this, it's best to use the GUI FFlag editor that the Lucem shell provides, as it instantly validates everything and shows you",
+        "If you do not understand this, it's best to use the GUI FFlag editor that the verm shell provides, as it instantly validates everything and shows you",
         " friendly error messages if you make a mistake.",
       )
     of "apkupdates":
@@ -440,7 +440,7 @@ proc explainConfig*(question: Question) =
     else:
       noDocs
   else:
-    error "lucem: no documentation exists for category \"" & question.category & '"'
+    error "verm: no documentation exists for category \"" & question.category & '"'
     quit(1)
 
 proc explain*(question: Question) {.inline.} =
@@ -455,7 +455,7 @@ proc explain*(question: Question) {.inline.} =
 proc generateQuestion*(input: Input): Question =
   template showErrorAndDie() =
     stderr.styledWriteLine(
-      styleUnderscore, "Usage", resetStyle, ": lucem ", fgGreen, "explain ", resetStyle,
+      styleUnderscore, "Usage", resetStyle, ": verm ", fgGreen, "explain ", resetStyle,
       "<", styleItalic, "kind", resetStyle, "> <", styleItalic, "arguments", resetStyle,
       ">",
     )
@@ -484,7 +484,7 @@ proc generateQuestion*(input: Input): Question =
     )
     stderr.styledWriteLine(
       fgRed, "* ", resetStyle, fgGreen, "config", resetStyle, ": ", styleBright,
-      "<category> <name> (eg, lucem discord_rpc)",
+      "<category> <name> (eg, verm discord_rpc)",
     )
     quit(1)
 

@@ -11,7 +11,7 @@ proc httpGet*(url: string): string =
   debug "http: making HTTP/GET request to " & url & "; allocating HttpClient"
   let
     headers = toWebby(@[
-      ("User-Agent", "lucem/" & Version)
+      ("User-Agent", "verm/" & Version)
     ])
     startReq = getMonoTime()
     req = curl.get(url, headers)

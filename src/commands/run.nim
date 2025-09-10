@@ -19,21 +19,21 @@ const FFlagsFile* =
 let fflagsFile = FFlagsFile % [getHomeDir(), SOBER_APP_ID]
 
 proc updateConfig*(input: Input, config: Config) =
-  info "lucem: updating config"
+  info "verm: updating config"
   if not fileExists(fflagsFile):
-    error "lucem: could not open pre-existing FFlags file. Run `lucem init` first."
+    error "verm: could not open pre-existing FFlags file. Run `verm init` first."
     quit(1)
 
   var sober = getSoberConfig()
 
-  info "lucem: target FPS is set to: " & $config.client.fps
+  info "verm: target FPS is set to: " & $config.client.fps
   sober.fflags["DFIntTaskSchedulerTargetFps"] = newJInt(int(config.client.fps))
   sober.useOpengl = config.client.renderer == Renderer.OpenGL
 
   if not config.client.telemetry:
-    info "lucem: disabling telemetry FFlags"
+    info "verm: disabling telemetry FFlags"
   else:
-    warn "lucem: enabling telemetry FFlags. This is not recommended!"
+    warn "verm: enabling telemetry FFlags. This is not recommended!"
 
   if not input.enabled("skip-patching", "N"):
     enableOldOofSound(config.tweaks.oldOof)
@@ -43,7 +43,7 @@ proc updateConfig*(input: Input, config: Config) =
     setSunTexture(config.tweaks.sun)
     setMoonTexture(config.tweaks.moon)
   else:
-    info "lucem: skipping patching (--skip-patching or -S was provided)"
+    info "verm: skipping patching (--skip-patching or -S was provided)"
 
   for flag in [
     "FFlagDebugDisableTelemetryEphemeralCounter",
@@ -51,7 +51,7 @@ proc updateConfig*(input: Input, config: Config) =
     "FFlagDebugDisableTelemetryPoint", "FFlagDebugDisableTelemetryV2Counter",
     "FFlagDebugDisableTelemetryV2Event", "FFlagDebugDisableTelemetryV2Stat",
   ]:
-    debug "lucem: set flag `" & flag & "` to " & $(not config.client.telemetry)
+    debug "verm: set flag `" & flag & "` to " & $(not config.client.telemetry)
     sober.fflags[flag] = newJBool(not config.client.telemetry)
 
   parseFFlags(config, sober.fflags)
@@ -74,12 +74,12 @@ proc eventWatcher*(
     setLogFilter(lvlAll)
 
   var reactor = newReactor()
-  debug "lucem: connecting to lucemd at port " & $port
+  debug "verm: connecting to vermd at port " & $port
   var server = reactor.connect("127.0.0.1", int port)
 
   template send[T](data: T) =
     let serialized = data.serialize()
-    debug "lucem: sending to daemon: " & serialized
+    debug "verm: sending to daemon: " & serialized
     reactor.send(server, serialized)
 
     for _ in 0 .. 32:
@@ -100,7 +100,7 @@ proc eventWatcher*(
     let logFile = readFile(getSoberLogPath()).splitLines()
 
     if ticksUntilSoberRunCheck < 1:
-      # debug "lucem: checking if sober is still running"
+      # debug "verm: checking if sober is still running"
       soberIsRunning = soberRunning()
       ticksUntilSoberRunCheck = 5000
 
@@ -123,7 +123,7 @@ proc eventWatcher*(
       startedPlayingAt = epochTime()
       startingTime = startedPlayingAt
 
-      info "lucem: joined game"
+      info "verm: joined game"
 
       send(
         Packet(
@@ -137,7 +137,7 @@ proc eventWatcher*(
     if data.contains("[FLog::Network] UDMUX Address ="):
       let str = data.split(" = ")[1].split(",")[0]
 
-      info "lucem: server IP: " & str
+      info "verm: server IP: " & str
 
       send(
         Packet(
@@ -152,19 +152,19 @@ proc eventWatcher*(
         data.contains("[FLog::Network] Connection lost - Cannot contact server/client"):
       continue
 
-    # sleep(config.lucem.pollingDelay.int)
+    # sleep(config.verm.pollingDelay.int)
     hasntStarted = false
     inc line
 
-  info "lucem: Sober seems to have exited - we'll stop here too. Adios!"
+  info "verm: Sober seems to have exited - we'll stop here too. Adios!"
 
 proc runRoblox*(input: Input, config: Config) =
-  info "lucem: running Roblox via Sober"
+  info "verm: running Roblox via Sober"
   runUpdateChecker(config)
 
   writeFile(getSoberLogPath(), newString(0))
 
-  info "lucem: redirecting sober logs to: " & getSoberLogPath()
+  info "verm: redirecting sober logs to: " & getSoberLogPath()
   discard flatpakRun(SOBER_APP_ID, getSoberLogPath(), config.client.launcher, config)
   
   eventWatcher(input = input, config = config)

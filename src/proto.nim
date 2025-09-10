@@ -1,4 +1,4 @@
-## Shared protocol between lucem client and daemon
+## Shared protocol between verm client and daemon
 ## Copyright (C) 2024 Trayambak Rai
 import std/[json, options, logging, base64]
 import pkg/[jsony, netty]

@@ -7,11 +7,11 @@
    viewBox="0 0 420 130"
    version="1.1"
    id="svg1"
-   inkscape:export-filename="lucem-title.png"
+   inkscape:export-filename="verm-title.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
-   sodipodi:docname="lucem-title.svg"
+   sodipodi:docname="verm-title.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -108,7 +108,7 @@
        gradientUnits="userSpaceOnUse" />
   </defs>
   <g
-     inkscape:label="Lucem"
+     inkscape:label="verm"
      inkscape:groupmode="layer"
      id="layer1-2"
      transform="matrix(1.4938524,0,0,1.4938524,-162.39377,-318.29241)">
@@ -119,7 +119,7 @@
        d="m 7.6798782,0.2547871 c -4.1134501,0 -7.42509349,3.3116434 -7.42509349,7.4250935 V 112.82964 c 0,4.11345 3.31164339,7.42509 7.42509349,7.42509 H 112.82964 c 4.11345,0 7.42509,-3.31164 7.42509,-7.42509 V 82.244801 H 77.087255 66.265443 43.422262 c -2.85726,0 -5.157544,-2.300283 -5.157544,-5.157543 V 53.356293 43.422264 0.2547871 Z m 52.1989818,0 V 38.264721 h 17.208395 c 2.85726,0 5.157544,2.300283 5.157544,5.157543 V 60.630659 H 120.25473 V 7.6798806 c 0,-4.1134501 -3.31164,-7.4250935 -7.42509,-7.4250935 z"
        sodipodi:nodetypes="sssssscccsscccsccssccssc"
        transform="matrix(0.5730869,0.16433002,-0.16433002,0.5730869,127.27724,212.14696)"
-       inkscape:export-filename="L-for-lucem.png"
+       inkscape:export-filename="L-for-verm.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        inkscape:original-d="m 7.6798782,0.2547871 c -4.1134501,0 -7.42509349,3.3116434 -7.42509349,7.4250935 V 112.82964 c 0,4.11345 3.31164339,7.42509 7.42509349,7.42509 H 112.82964 c 4.11345,0 7.42509,-3.31164 7.42509,-7.42509 V 82.244801 H 77.087255 66.265443 43.422262 c -2.85726,0 -5.157544,-2.300283 -5.157544,-5.157543 V 53.356293 43.422264 0.2547871 Z m 52.1989818,0 V 38.264721 h 17.208395 c 2.85726,0 5.157544,2.300283 5.157544,5.157543 V 60.630659 H 120.25473 V 7.6798806 c 0,-4.1134501 -3.31164,-7.4250935 -7.42509,-7.4250935 z"
@@ -136,6 +136,6 @@
          y="367.88104"
          id="tspan4"><tspan
            style="baseline-shift:baseline"
-           id="tspan3">Lucem</tspan></tspan></text>
+           id="tspan3">verm</tspan></tspan></text>
   </g>
 </svg>

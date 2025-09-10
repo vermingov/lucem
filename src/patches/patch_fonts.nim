@@ -9,44 +9,44 @@ const SoberFontsPath* {.strdefine.} =
 proc setClientFont*(fontPath: string, exclude: seq[string]) =
   let basePath = SoberFontsPath % [getHomeDir()]
   if fontPath.len > 0:
-    debug "lucem: patching client font to `" & fontPath & '`'
+    debug "verm: patching client font to `" & fontPath & '`'
     if not fileExists(fontPath):
-      error "lucem: cannot set client font to `" & fontPath & "`: file not found"
+      error "verm: cannot set client font to `" & fontPath & "`: file not found"
       return
 
     when defined(release):
-      if fileExists(basePath / "lucem_patched") and
-          readFile(basePath / "lucem_patched") == fontPath:
-        debug "lucem: font patch is already applied, ignoring."
+      if fileExists(basePath / "verm_patched") and
+          readFile(basePath / "verm_patched") == fontPath:
+        debug "verm: font patch is already applied, ignoring."
         return
 
-    writeFile(basePath / "lucem_patched", fontPath)
+    writeFile(basePath / "verm_patched", fontPath)
     discard existsOrCreateDir(basePath / "old_roblox_fonts")
     var patched: int
 
     for kind, file in walkDir(basePath):
       if kind != pcFile:
         continue
-      if file.contains("lucem_patched"):
+      if file.contains("verm_patched"):
         continue
       let splitted = file.splitFile()
 
       if file.splitPath().tail in exclude:
-        info "lucem: font file \"" & file &
+        info "verm: font file \"" & file &
           "\" is in the exclusion list, not overriding it."
         continue
 
       moveFile(file, basePath / "old_roblox_fonts" / splitted.name & splitted.ext)
       copyFile(fontPath, file)
       inc patched
-      debug "lucem: " & fontPath & " >> " & file
+      debug "verm: " & fontPath & " >> " & file
 
-    info "lucem: patched " & $patched & " fonts successfully!"
+    info "verm: patched " & $patched & " fonts successfully!"
   else:
-    if not fileExists(basePath / "lucem_patched"):
+    if not fileExists(basePath / "verm_patched"):
       return
 
-    debug "lucem: restoring client font to defaults"
+    debug "verm: restoring client font to defaults"
 
     # clear out all patched fonts
     for kind, file in walkDir(basePath):
@@ -57,11 +57,11 @@ proc setClientFont*(fontPath: string, exclude: seq[string]) =
 
       removeFile(file)
 
-    debug "lucem: moving old fonts back to their place"
+    debug "verm: moving old fonts back to their place"
 
     if not dirExists(basePath / "old_roblox_fonts"):
-      error "lucem: the old Roblox fonts were somehow deleted!"
-      error "lucem: you probably messed something up, run `lucem init` to fix it up."
+      error "verm: the old Roblox fonts were somehow deleted!"
+      error "verm: you probably messed something up, run `verm init` to fix it up."
       quit(1)
 
     var restored: int
@@ -70,11 +70,11 @@ proc setClientFont*(fontPath: string, exclude: seq[string]) =
         continue
       let splitted = file.splitFile()
 
-      debug "lucem: " & file & " >> " & basePath / splitted.name & splitted.ext
+      debug "verm: " & file & " >> " & basePath / splitted.name & splitted.ext
       moveFile(file, basePath / splitted.name & splitted.ext)
 
       inc restored
 
-    removeFile(basePath / "lucem_patched")
+    removeFile(basePath / "verm_patched")
     removeDir(basePath / "old_roblox_fonts")
-    info "lucem: restored " & $restored & " fonts to their defaults!"
+    info "verm: restored " & $restored & " fonts to their defaults!"

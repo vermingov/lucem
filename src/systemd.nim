@@ -1,4 +1,4 @@
-## professional lucemd systemd service installer
+## professional vermd systemd service installer
 ## Copyright (C) 2024 Trayambak Rai
 import std/[os, strutils, logging, osproc]
 import ./meta
@@ -6,7 +6,7 @@ import ./meta
 const
   SystemdServiceTemplate = """
 [Unit]
-Description=Lucem $1
+Description=verm $1
 After=network.target
 
 [Service]
@@ -18,9 +18,9 @@ WantedBy=default.target
 """
 
 proc installSystemdService* =
-  info "lucem: installing systemd service"
+  info "verm: installing systemd service"
   let service = SystemdServiceTemplate % [
-    Version, getAppDir() / "lucemd"
+    Version, getAppDir() / "vermd"
   ]
   let servicesDir = getConfigDir() / "systemd" / "user"
 
@@ -28,13 +28,13 @@ proc installSystemdService* =
     discard existsOrCreateDir(getConfigDir() / "systemd")
     discard existsOrCreateDir(servicesDir)
 
-  writeFile(servicesDir / "lucem.service", service)
-  if execCmd(findExe("systemctl") & " enable lucem.service --user --now") != 0:
-    error "lucem: failed to install systemd service for daemon!"
+  writeFile(servicesDir / "verm.service", service)
+  if execCmd(findExe("systemctl") & " enable verm.service --user --now") != 0:
+    error "verm: failed to install systemd service for daemon!"
 
 proc relaunchSystemdService* =
-  info "lucem: relaunching systemd service"
+  info "verm: relaunching systemd service"
   if execCmd(
-    findExe("systemctl") & " restart lucem.service --user"
+    findExe("systemctl") & " restart verm.service --user"
   ) != 0:
-    error "lucem: failed to restart lucem daemon!"
+    error "verm: failed to restart verm daemon!"

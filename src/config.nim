@@ -18,7 +18,7 @@ proc autodetectWindowingBackend*(): WindowingBackend {.inline.} =
   of "x11":
     return WindowingBackend.X11
   else:
-    warn "lucem: XDG_SESSION_TYPE was set to \"" & getEnv("XDG_SESSION_TYPE") &
+    warn "verm: XDG_SESSION_TYPE was set to \"" & getEnv("XDG_SESSION_TYPE") &
       "\"; defaulting to X11"
     return WindowingBackend.X11
 
@@ -30,7 +30,7 @@ type
   APKConfig* = object
     version*: string = ""
 
-  LucemConfig* = object
+  vermConfig* = object
     discord_rpc*: bool = false
     auto_updater*: bool = true
     notify_server_region*: bool = true
@@ -40,7 +40,7 @@ type
   ClientConfig* = object
     fps*: int = 60
     launcher*: string = ""
-    resolve_exe*: bool = true ## Whether Lucem should try to find the absolute path to a launcher binary
+    resolve_exe*: bool = true ## Whether verm should try to find the absolute path to a launcher binary
     renderer*: Renderer = Renderer.Vulkan
     backend*: string
     telemetry*: bool = false
@@ -67,7 +67,7 @@ type
 
   Config* = object
     apk*: APKConfig
-    lucem*: LucemConfig
+    verm*: vermConfig
     tweaks*: Tweaks
     client*: ClientConfig
     overlay*: OverlayConfig
@@ -75,7 +75,7 @@ type
 
 proc backend*(config: Config): WindowingBackend =
   if config.client.backend.len < 1:
-    debug "lucem: backend name was not set, defaulting to autodetection"
+    debug "verm: backend name was not set, defaulting to autodetection"
     return autodetectWindowingBackend()
 
   case config.client.backend.toLowerAscii()
@@ -84,14 +84,14 @@ proc backend*(config: Config): WindowingBackend =
   of "x11", "xorg", "bloat", "garbage":
     return WindowingBackend.X11
   else:
-    warn "lucem: invalid backend name \"" & config.client.backend &
+    warn "verm: invalid backend name \"" & config.client.backend &
       "\"; using autodetection"
     return autodetectWindowingBackend()
 
 const
   DefaultConfig* =
     """
-[lucem]
+[verm]
 discord_rpc = true
 notify_server_region = true
 loading_screen = true
@@ -122,7 +122,7 @@ fflags = "\n"
 apkUpdates = true
 """
 
-  ConfigLocation* {.strdefine: "LucemConfigLocation".} = "$1/.config/lucem/"
+  ConfigLocation* {.strdefine: "vermConfigLocation".} = "$1/.config/verm/"
 
 proc save*(config: Config) {.inline.} =
   writeFile(ConfigLocation % [getHomeDir()] / "config.toml", Toml.encode(config))
@@ -138,7 +138,7 @@ proc parseConfig*(input: Input): Config {.inline.} =
       elif fileExists(ConfigLocation % [getHomeDir()] / "config.toml"):
         ConfigLocation % [getHomeDir()] / "config.toml"
       else:
-        warn "lucem: cannot find config file, defaulting to built-in config file."
+        warn "verm: cannot find config file, defaulting to built-in config file."
         writeFile(ConfigLocation % [getHomeDir()] / "config.toml", DefaultConfig)
         ConfigLocation % [getHomeDir()] / "config.toml"
     )
@@ -146,6 +146,6 @@ proc parseConfig*(input: Input): Config {.inline.} =
   try:
     Toml.decode(config, Config)
   except TomlFieldReadingError as exc:
-    warn "lucem: unable to read configuration: " & exc.msg
-    warn "lucem: falling back to internal default configuration: your changes will NOT be respected!"
+    warn "verm: unable to read configuration: " & exc.msg
+    warn "verm: falling back to internal default configuration: your changes will NOT be respected!"
     Toml.decode(DefaultConfig, Config)

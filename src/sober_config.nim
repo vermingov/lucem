@@ -19,12 +19,12 @@ proc getSoberConfigPath*: string {.inline.} =
 
 proc getSoberConfig*: SoberConfig =
   let path = getSoberConfigPath()
-  debug "lucem: getting sober config file at: " & path
+  debug "verm: getting sober config file at: " & path
 
   try:
     return fromJson(readFile(path), SoberConfig)
   except jsony.JsonError as exc:
-    warn "lucem: cannot read sober config file: " & exc.msg
+    warn "verm: cannot read sober config file: " & exc.msg
 
 proc saveSoberConfig*(config: SoberConfig) {.inline.} =
   writeFile(

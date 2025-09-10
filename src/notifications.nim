@@ -22,7 +22,7 @@ proc notifyFallback*(
   cmd &= '"' & heading & "\" "
   cmd &= '"' & description & "\" "
   cmd &= "--expire-time=" & $expireTime & ' '
-  cmd &= "--app-name=Lucem "
+  cmd &= "--app-name=verm "
 
   if *icon:
     debug "notifications: icon was specified: " & &icon
@@ -43,16 +43,16 @@ proc notify*(
   expireTime: uint64 = 240000,
   icon: Option[string] = none(string)
 ) =
-  var worker = findExe("lucem_overlay")
+  var worker = findExe("verm_overlay")
   if getEnv("XDG_CURRENT_DESKTOP") == "GNOME" or (defined(release) and worker.len < 1):
-    warn "notifications: we're either on GNOME or the lucem overlay binary is missing, something went horribly wrong!"
+    warn "notifications: we're either on GNOME or the verm overlay binary is missing, something went horribly wrong!"
     notifyFallback(heading, description, expireTime, icon)
     return
   
   let pid = fork()
 
   if worker.len < 1 and not defined(release):
-    worker = "./lucem_overlay"
+    worker = "./verm_overlay"
 
   if pid == 0:
     let cmd = worker & " --heading:\"" & heading.encode() & "\" --description:\"" & description.encode() & "\" --expire-time:" & $(expireTime.int / 1000) & ' ' & (if *icon: "--icon:" & &icon else: "")
@@ -65,9 +65,9 @@ proc presentUpdateAlert*(
   message: string,
   blocks: bool = false
 ) =
-  var worker = findExe("lucem_overlay")
+  var worker = findExe("verm_overlay")
   if getEnv("XDG_CURRENT_DESKTOP") == "GNOME" or (defined(release) and worker.len < 1):
-    warn "notifications: we're either on GNOME or the lucem overlay binary is missing, something went horribly wrong!"
+    warn "notifications: we're either on GNOME or the verm overlay binary is missing, something went horribly wrong!"
     notifyFallback(heading, message, 240000)
     return
 
@@ -79,7 +79,7 @@ proc presentUpdateAlert*(
     0
 
   if worker.len < 1 and not defined(release):
-    worker = "./lucem_overlay"
+    worker = "./verm_overlay"
 
   if pid == 0:
     let cmd = worker & " --update-alert --update-heading:\"" & heading.encode() & "\" --update-message:\"" & message.encode() & '"'

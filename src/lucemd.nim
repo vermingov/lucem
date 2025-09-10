@@ -1,4 +1,4 @@
-## Lucem daemon
+## verm daemon
 ## Copyright (C) 2024 Trayambak Rai
 import std/[os, logging, strutils, json]
 import ./[argparser, config, sugar, proto, notifications]
@@ -33,7 +33,7 @@ proc onGameJoined*(daemon: var Daemon, data: string) =
     else:
       jdata &= c
 
-  debug "lucem: join metadata: " & jdata
+  debug "verm: join metadata: " & jdata
 
   let
     placeId = $parseJson(jdata)["placeId"].getInt()
@@ -43,18 +43,18 @@ proc onGameJoined*(daemon: var Daemon, data: string) =
     thumbnail = getGameIcon(universeId)
 
   if !gameData:
-    warn "lucem: failed to fetch game data; RPC will not be set."
+    warn "verm: failed to fetch game data; RPC will not be set."
     return
 
   if !thumbnail:
-    warn "lucem: failed to fetch game thumbnail; RPC will not be set."
+    warn "verm: failed to fetch game thumbnail; RPC will not be set."
     return
 
   let
     data = &gameData
     icon = &thumbnail
 
-  info "lucem: Joined game!"
+  info "verm: Joined game!"
   info "Name: " & data.name
   info "Description: " & data.description
   info "Price: " & (if *data.price: $(&data.price) & " robux" else: "free")
@@ -63,10 +63,10 @@ proc onGameJoined*(daemon: var Daemon, data: string) =
   info "  Verified: " & $data.creator.hasVerifiedBadge
 
 proc onServerIPRevealed*(daemon: var Daemon, ipAddr: string) =
-  #[if not daemon.config.lucem.notifyServerRegion:
+  #[if not daemon.config.verm.notifyServerRegion:
     return]#
 
-  debug "lucem: server IP is: " & ipAddr
+  debug "verm: server IP is: " & ipAddr
 
   if (let ipinfo = getIpInfo(ipAddr); *ipinfo):
     let data = &ipinfo
@@ -76,18 +76,18 @@ proc onServerIPRevealed*(daemon: var Daemon, ipAddr: string) =
       10000,
     )
   else:
-    warn "lucem: failed to get server location data!"
+    warn "verm: failed to get server location data!"
     notify("Server Location", "Failed to fetch server location data.", 10000)
 
 proc loop*(daemon: var Daemon) =
-  info "lucemd: entering loop"
+  info "vermd: entering loop"
   while not daemon.shouldQuit:
     sleep(5)
     daemon.reactor.tick()
     for message in daemon.reactor.messages:
       let opacket = message.getPacket()
       if not *opacket:
-        warn "lucemd: got bogus data, ignoring."
+        warn "vermd: got bogus data, ignoring."
         continue
 
       let packet = &opacket
@@ -100,7 +100,7 @@ proc loop*(daemon: var Daemon) =
         daemon.onServerIPRevealed(data)
 
 proc initDaemon*(input: Input, config: Config) =
-  info "lucemd: initializing daemon..."
+  info "vermd: initializing daemon..."
   let
     port =
       if (let opt = input.flag("port"); *opt):
@@ -108,7 +108,7 @@ proc initDaemon*(input: Input, config: Config) =
       else:
         config.daemon.port
 
-  info "lucemd: initializing reactor at port " & $port
+  info "vermd: initializing reactor at port " & $port
   var daemon: Daemon
   daemon.reactor = newReactor("127.0.0.1", int port)
   daemon.loop()
@@ -116,7 +116,7 @@ proc initDaemon*(input: Input, config: Config) =
 proc main =
   addHandler(newColoredLogger())
 
-  info "lucemd@" & Version & " starting up!"
+  info "vermd@" & Version & " starting up!"
   let input = parseInput()
   
   if input.enabled("verbose"):

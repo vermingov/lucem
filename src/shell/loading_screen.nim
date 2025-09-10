@@ -1,4 +1,4 @@
-## Loading screen which shows up when `lucem run` is invoked
+## Loading screen which shows up when `verm run` is invoked
 ## Copyright (C) 2024 Trayambak Rai
 import std/[logging, locks]
 import owlkettle, owlkettle/adw, owlkettle/bindings/gtk
@@ -36,7 +36,7 @@ method view*(app: LoadingScreenState): Widget =
 
   result = gui:
     Window:
-      title = "Lucem"
+      title = "verm"
       defaultSize = (637, 246)
 
       Box:

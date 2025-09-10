@@ -6,7 +6,7 @@ description = "A small wrapper over Sober that provides quality of life improvem
 license = "MIT"
 srcDir = "src"
 backend = "c"
-bin = @["lucem", "lucemd", "lucem_overlay"]
+bin = @["verm", "vermd", "verm_overlay"]
 
 # Dependencies
 
@@ -24,12 +24,12 @@ requires "siwin#9ce9aa3efa84f55bbf3d29ef0517b2411d08a357"
 requires "opengl >= 1.2.9"
 
 after install:
-  exec "$HOME/.nimble/bin/lucem init"
+  exec "$HOME/.nimble/bin/verm init"
 
   echo "\e[1mPssst, hey you!\e[0m"
   echo "\e[1;34mYes, you!\e[0m"
-  echo "\e[1mThanks for installing Lucem!"
-  echo "If you run `lucem` in the terminal and no command is found, try running the command below:\e[0m"
+  echo "\e[1mThanks for installing verm!"
+  echo "If you run `verm` in the terminal and no command is found, try running the command below:\e[0m"
   echo "\e[1:32mexport PATH=\"$HOME/.nimble/bin:$PATH\"\e[0m"
 
 requires "semver >= 1.2.3"

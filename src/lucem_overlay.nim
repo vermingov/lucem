@@ -1,4 +1,4 @@
-## Lucem Overlay
+## verm Overlay
 ## Copyright (C) 2024 Trayambak Rai
 
 import std/[os, osproc, logging, strutils, importutils, base64, times]
@@ -39,7 +39,7 @@ type
     closed*: bool
     config*: Config
 
-    lucemImage*: Image
+    vermImage*: Image
 
     vg*: NVGContext
     wl*: WindowWaylandOpengl
@@ -69,13 +69,13 @@ proc draw*(overlay: var Overlay) =
   overlay.vg.fontSize(overlay.config.overlay.headingSize)
   overlay.vg.fillColor(white(255))
 
-  var icon = cast[seq[byte]](LucemIconPng)
-  overlay.lucemImage = overlay.vg.createImageMem(data = icon)
+  var icon = cast[seq[byte]](vermIconPng)
+  overlay.vermImage = overlay.vg.createImageMem(data = icon)
 
   if overlay.state == osOverlay:
     discard overlay.vg.text(16f, 16f, overlay.heading)
   else:
-    let imgPaint = overlay.vg.imagePattern(16, 16, 60, 60, 0, overlay.lucemImage, 1f)
+    let imgPaint = overlay.vg.imagePattern(16, 16, 60, 60, 0, overlay.vermImage, 1f)
     overlay.vg.beginPath()
     overlay.vg.rect(16, 16, 60, 60)
     overlay.vg.fillPaint(imgPaint)
@@ -136,7 +136,7 @@ proc initOverlay*(input: Input) {.noReturn.} =
     kind = WindowWaylandKind.LayerSurface,
     layer = Layer.Overlay,
     size = overlay.size,
-    namespace = "lucem"
+    namespace = "verm"
   )
   overlay.wl.setKeyboardInteractivity(LayerInteractivityMode.OnDemand)
   var anchors: seq[LayerEdge]
@@ -204,8 +204,8 @@ proc initOverlay*(input: Input) {.noReturn.} =
     if overlay.state == osUpdateAlert:
       case event.key
       of enter:
-        overlay.description = "Lucem is updating itself. Please wait."
-        discard execCmd(findExe("lucem") & " update")
+        overlay.description = "verm is updating itself. Please wait."
+        discard execCmd(findExe("verm") & " update")
         overlay.description = "Done!"
         overlay.wl.close()
       else: overlay.wl.close()

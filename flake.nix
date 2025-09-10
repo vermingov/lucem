@@ -17,8 +17,8 @@
       in
       {
         packages = rec {
-          lucem = pkgs.buildNimPackage {
-            pname = "lucem";
+          verm = pkgs.buildNimPackage {
+            pname = "verm";
             version = "2.1.2";
 
             src = ./.;
@@ -44,7 +44,7 @@
               wayland-scanner.dev
             ];
 
-            nimbleFile = ./lucem.nimble;
+            nimbleFile = ./verm.nimble;
             lockFile = ./nix/lock.json;
 
             nimFlags = [
@@ -55,7 +55,7 @@
               "--panics:on"
             ];
           };
-          default = lucem;
+          default = verm;
         };
 
         devShells.default = pkgs.mkShell {

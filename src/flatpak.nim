@@ -54,12 +54,12 @@ proc flatpakRun*(
 
     debug "flatpak: final command: " & cmd
     if dup2(file, STDOUT_FILENO) < 0:
-      error "lucem: dup2() for stdout failed: " & $strerror(errno)
+      error "verm: dup2() for stdout failed: " & $strerror(errno)
     else:
-      debug "lucem: dup2() successful, sober's logs are now directed at: " & path
+      debug "verm: dup2() successful, sober's logs are now directed at: " & path
 
     discard execCmd(cmd)
-    debug "lucem: sober has exited, forked lucem process is exiting..."
+    debug "verm: sober has exited, forked verm process is exiting..."
     quit(0)
   else:
     debug "flatpak: we are the parent - continuing"

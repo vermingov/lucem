@@ -11,25 +11,25 @@ type CacheStruct* = object
   payload*: string
 
 proc createCacheDir() {.inline.} =
-  if not existsOrCreateDir(getCacheDir() / "lucem"):
+  if not existsOrCreateDir(getCacheDir() / "verm"):
     debug "cache_calls: creating cache directory"
 
-  if not existsOrCreateDir(getCacheDir() / "lucem" / "state"):
+  if not existsOrCreateDir(getCacheDir() / "verm" / "state"):
     debug "cache_calls: creating state directory"
 
 proc storeState*[T](prop: string, val: T) {.inline.} =
   let serialized = toJson(val)
   debug "cache_calls: storing state property: " & prop & " = " & serialized
 
-  writeFile(getCacheDir() / "lucem" / "state" / prop & ".lucem", serialized)
+  writeFile(getCacheDir() / "verm" / "state" / prop & ".verm", serialized)
 
 proc getState*[T](prop: string, kind: typedesc[T], fallback: T): T =
-  if not fileExists(getCacheDir() / "lucem" / "state" / prop & ".lucem"):
+  if not fileExists(getCacheDir() / "verm" / "state" / prop & ".verm"):
     debug "cache_calls: state property doesn't exist, using fallback"
     return fallback
 
   try:
-    return readFile(getCacheDir() / "lucem" / "state" / prop & ".lucem").fromJson(kind)
+    return readFile(getCacheDir() / "verm" / "state" / prop & ".verm").fromJson(kind)
   except jsony.JsonError as exc:
     warn "cache_calls: failed to read state property \"" & prop & "\": " & exc.msg
 
@@ -37,7 +37,7 @@ proc clearCache*(): float =
   var sizeMb: int
   debug "cache_calls: clearing cache"
 
-  for file in walkDirRec(getCacheDir() / "lucem"):
+  for file in walkDirRec(getCacheDir() / "verm"):
     if fileExists(file):
       debug "cache_calls: remove file: " & file
       sizeMb += getFileSize(file)
@@ -52,7 +52,7 @@ proc cacheSingleParam*[T](call: string, parameter: string, obj: T) =
   createCacheDir()
 
   let
-    path = getCacheDir() / "lucem" / call & ".json"
+    path = getCacheDir() / "verm" / call & ".json"
     serialized = toJson obj
 
   var entries =
@@ -77,7 +77,7 @@ proc findCacheSingleParam*[T](
     call & '"'
   createCacheDir()
 
-  let path = getCacheDir() / "lucem" / call & ".json"
+  let path = getCacheDir() / "verm" / call & ".json"
   if not fileExists(path):
     debug "cache_calls: cache file not found: " & path
     return

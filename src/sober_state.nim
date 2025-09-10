@@ -27,26 +27,26 @@ func getSoberStatePath*(): string {.inline.} =
 proc loadSoberState*(): SoberState =
   ## Load Sober's state JSON file.
   ## This function is guaranteed to succeed.
-  debug "lucem: loading sober's internal state"
+  debug "verm: loading sober's internal state"
   if not fileExists(getSoberStatePath()):
-    error "lucem: sober has not been launched before as the internal state file could not be found!"
-    error "lucem: falling back to lucem's preferred configuration"
+    error "verm: sober has not been launched before as the internal state file could not be found!"
+    error "verm: falling back to verm's preferred configuration"
     return default(SoberState)
 
   template deserializationFailure() =
-    warn "lucem: failed to deserialize sober's internal state: " & exc.msg
-    warn "lucem: falling back to lucem's preferred configuration"
+    warn "verm: failed to deserialize sober's internal state: " & exc.msg
+    warn "verm: falling back to verm's preferred configuration"
     return default(SoberState)
 
   template readFailure() =
-    warn "lucem: failed to read sober's internal state: " & exc.msg
-    warn "lucem: falling back to lucem's preferred configuration"
+    warn "verm: failed to read sober's internal state: " & exc.msg
+    warn "verm: falling back to verm's preferred configuration"
     return default(SoberState)
 
   template unknownFailure() =
-    warn "lucem: an unknown error occured during reading sober's internal state: " &
+    warn "verm: an unknown error occured during reading sober's internal state: " &
       exc.msg
-    warn "lucem: falling back to lucem's preferred configuration"
+    warn "verm: falling back to verm's preferred configuration"
     return default(SoberState)
 
   try:
@@ -65,21 +65,21 @@ proc loadSoberState*(): SoberState =
 proc patchSoberState*(input: Input, config: Config) =
   var state = loadSoberState()
   
-  if config.lucem.discord_rpc:
+  if config.verm.discord_rpc:
     state.v1.enableDiscordRpc = true
 
   if not input.enabled("use-sober-patching", "P"):
-    debug "lucem: disabling sober's builtin patching"
+    debug "verm: disabling sober's builtin patching"
     state.v1.bringBackOof = false
     state.v1.broughtBackOof = false
   else:
-    warn "lucem: you have explicitly stated that you wish to use Sober's oof sound patcher."
-    warn "lucem: we already provide this feature, but if you choose to use Sober's patcher, do not report any bugs that arise from this to us."
+    warn "verm: you have explicitly stated that you wish to use Sober's oof sound patcher."
+    warn "verm: we already provide this feature, but if you choose to use Sober's patcher, do not report any bugs that arise from this to us."
 
   state.v2.r1_enabled = config.client.apkUpdates
   if state.v2.r1_enabled:
-    debug "lucem: enabling apk updates"
+    debug "verm: enabling apk updates"
   else:
-    debug "lucem: disabling apk updates"
+    debug "verm: disabling apk updates"
 
   writeFile(getSoberStatePath(), toJson(state))
