@@ -548,7 +548,7 @@ method view(app: vermShellState): Widget =
                         
               ComboRow:
                 title = "Anti-aliasing quality (MSAA)"
-                subtitle = "Select the number of MSAA samples (0 disables)."
+                subtitle = "Select the number of MSAA samples."
                 items = @["Automatic", "0", "1", "2", "4", "8"]
                 selected = app.msaaSelected
 
@@ -616,7 +616,7 @@ method view(app: vermShellState): Widget =
                   debug "shell: updated rendering API FFlags"
               ComboRow:
                 title = "Texture Quality"
-                subtitle = "Prefer a texture quality level. Automatic removes the override."
+                subtitle = "Prefer a texture quality level."
                 items = @["Automatic", "Level 0 (Lowest)", "Level 1", "Level 2", "Level 3 (Highest)"]
                 selected = app.textureQualitySelected
 
