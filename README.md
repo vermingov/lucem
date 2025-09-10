@@ -1,9 +1,9 @@
 # Notice
 As of *8th of May, 2025*: Lucem is now **officially deprecated**. No updates will henceforth be released. 
 
-This is why Verm was created.
-Verm is a fork of Lucem, and i am constantly updating it to keep it working.
-I will also be adding new features every now and then.
+This is why Verm was created.\
+Verm is a fork of Lucem, and i am constantly updating it to keep it working.\
+I will also be adding new features every now and then.\
 Everything in here will stay open-source.
 
 ALL CREDITS GO TO THE OWNER OF THE ORIGINAL REPO: https://github.com/xTrayambak/lucem (Deprecated)
