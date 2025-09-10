@@ -52,20 +52,28 @@ proc flatpakRun*(
     warn "flatpak: ignoring for now."
 
   if fork() == 0:
-    var file = posix.open(path, O_WRONLY or O_CREAT or O_TRUNC, 0644)
-    assert(file >= 0)
+    var flags = O_WRONLY or O_CREAT or O_TRUNC
+    when declared(O_CLOEXEC): flags = flags or O_CLOEXEC
+    var file = posix.open(path, flags, 0644)
+    if file < 0:
+      warn "verm: failed to open log output path (" & path & ") for writing; falling back to /dev/null"
+      let nul = posix.open("/dev/null", O_WRONLY, 0644)
+      if nul >= 0:
+        file = nul
+      else:
+        error "verm: failed to open /dev/null for writing; continuing without redirection"
 
     debug "flatpak: child launching \"" & id & '"'
     var cmd = launcherExe & " flatpak run " & id
 
     debug "flatpak: final command: " & cmd
-    if dup2(file, STDOUT_FILENO) < 0:
+    if file >= 0 and dup2(file, STDOUT_FILENO) < 0:
       error "verm: dup2() for stdout failed: " & $strerror(errno)
     else:
       debug "verm: dup2() successful, sober's logs are now directed at: " & path
 
     # Also redirect stderr so Sober doesn't spam the console
-    if dup2(file, STDERR_FILENO) < 0:
+    if file >= 0 and dup2(file, STDERR_FILENO) < 0:
       error "verm: dup2() for stderr failed: " & $strerror(errno)
     else:
       debug "verm: stderr is also redirected to: " & path
