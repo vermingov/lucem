@@ -22,7 +22,13 @@ Please keep in mind that while verm is fully open source software, Sober is prop
 I have adressed and fixed alot of the issues the original has. \
 Here are some issues i have solved: \
 **Added FFlag entry validation** \
-**Server Region Indicator not working** 
+**Server Region Indicator not working** \
+**stdout/stderr redirection is guarded;** \
+**failure falls back to /dev/null (prevents child attaching to terminal pipes and blocking).** \
+**Sober liveness detection now uses flatpak ps (more reliable than pidof in sandboxed setups).** \
+**Watcher advances on disconnect, won’t busy-loop, and supports a delay. Region notifier works on each join, without overlay spam.** \
+**FFlag UI writes valid values and only touches relevant keys to avoid parse failures.** \
+**Overlay logs throttled and made less noisy.**
 
 ![A demo of verm demonstrating Discord rich presence and a notification saying where the server is located](screenshots/Bloxstrap.webp)
 
