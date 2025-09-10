@@ -61,7 +61,7 @@ proc draw*(overlay: var Overlay) =
     GL_DEPTH_BUFFER_BIT or
     GL_STENCIL_BUFFER_BIT)
 
-  overlay.vg.beginFrame(overlay.size.x.cfloat, overlay.size.y.cfloat, 1f) # TODO: fractional scaling support
+  overlay.vg.beginFrame(overlay.size.x.cfloat, overlay.size.y.cfloat, 1f)
   overlay.vg.roundedRect(0, 0, overlay.size.x.cfloat - 16f, overlay.size.y.cfloat, 16f)
   overlay.vg.fillColor(rgba(0.1, 0.1, 0.1, 0.6))
   overlay.wl.m_transparent = true
@@ -92,8 +92,7 @@ proc draw*(overlay: var Overlay) =
   overlay.vg.fillColor(white(255))
   overlay.vg.textBox(16f, 100f, 512f, overlay.description.cstring, nil)
 
-  # TODO: icon rendering, even though we don't use them yet
-  # but it'd be useful for the future
+  # Icon rendering can be added in the future if needed
 
   overlay.vg.endFrame()
 
@@ -216,7 +215,7 @@ proc initOverlay*(input: Input) {.noReturn.} =
     overlay.timeSpent += elapsed
     overlay.lastEpoch = epoch
 
-    # Throttle debug logging to once per second to avoid spamming
+    # Throttle debug logging to once per second
     let currentSec = int(floor(overlay.timeSpent))
     if currentSec != overlay.lastLogSecond:
       debug "overlay: " & $overlay.timeSpent & "s / " & $overlay.expireTime & 's'

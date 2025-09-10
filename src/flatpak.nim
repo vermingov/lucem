@@ -29,7 +29,6 @@ proc flatpakInstall*(id: string, user: bool = true): bool {.inline, discardable.
     true
 
 proc soberRunning*(): bool {.inline.} =
-  # Prefer flatpak ps to detect the app reliably
   execCmd("flatpak ps | grep -q " & SOBER_APP_ID) == 0
 
 proc flatpakRun*(
@@ -56,7 +55,7 @@ proc flatpakRun*(
     var file = posix.open(path, O_WRONLY or O_CREAT or O_TRUNC, 0644)
     assert(file >= 0)
 
-    debug "flatpak: we are the child - launching \"" & id & '"'
+    debug "flatpak: child launching \"" & id & '"'
     var cmd = launcherExe & " flatpak run " & id
 
     debug "flatpak: final command: " & cmd
@@ -75,7 +74,7 @@ proc flatpakRun*(
     debug "verm: sober has exited, forked verm process is exiting..."
     quit(0)
   else:
-    debug "flatpak: we are the parent - continuing"
+    debug "flatpak: parent continuing"
 
 proc flatpakKill*(id: string): bool {.inline, discardable.} =
   info "flatpak: killing flatpak app \"" & id & '"'
