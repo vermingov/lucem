@@ -68,6 +68,22 @@ viewable vermShell:
   # UI state for Texture Quality combobox
   textureQualitySelected:
     int
+  # UI state for additional render toggles
+  disablePlayerShadows:
+    bool
+  disablePostFx:
+    bool
+  disableTerrainTextures:
+    bool
+  # UI state for Lighting Technology combobox
+  lightingTechSelected:
+    int
+  # UI state for MSAA samples combobox
+  msaaSelected:
+    int
+  # UI state for GPU Light Culling toggle
+  gpuLightCulling:
+    bool
   fflagsErrorNotified:
     bool
 
@@ -119,7 +135,7 @@ method view(app: vermShellState): Widget =
         Button {.addLeft.}:
           sensitive = true
           #icon = "applications-science-symbolic"
-          text = "Tweaks"
+          text = "Mods"
           tooltip = "Restore the Oof sound, use custom fonts and more"
 
           # Switches to the tweaks page
@@ -184,6 +200,29 @@ method view(app: vermShellState): Widget =
               sizeRequest = (760, 560)
               title = "Tweaks and Patches"
               description = "These are some optional tweaks to customize your experience."
+
+              ActionRow:
+                title = "GPU Light Culling"
+                subtitle = "Enable GPU light culling and new light attenuation for improved lighting performance."
+                CheckButton {.addSuffix.}:
+                  state = app.gpuLightCulling
+
+                  proc changed(state: bool) =
+                    app.gpuLightCulling = state
+                    var lines = app.config[].client.fflags.splitLines()
+                    var kept: seq[string] = @[]
+                    for l in lines:
+                      let t = l.strip()
+                      if t.len == 0: continue
+                      let eq = t.find('=')
+                      let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                      if key notin ["FFlagNewLightAttenuation", "FFlagFastGPULightCulling3"]:
+                        kept.add(t)
+                    if state:
+                      kept.add("FFlagNewLightAttenuation=true")
+                      kept.add("FFlagFastGPULightCulling3=true")
+                    app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                    debug "shell: gpu light culling set to " & $state
 
               ActionRow:
                 title = "Bring Back the \"Oof\" Sound"
@@ -508,6 +547,34 @@ method view(app: vermShellState): Widget =
 
                         
               ComboRow:
+                title = "Anti-aliasing quality (MSAA)"
+                subtitle = "Select the number of MSAA samples (0 disables)."
+                items = @["Automatic", "0", "1", "2", "4", "8"]
+                selected = app.msaaSelected
+
+                proc select(selectedIndex: int) =
+                  let values = @[0, 1, 2, 4, 8]
+                  var lines = app.config[].client.fflags.splitLines()
+                  var kept: seq[string] = @[]
+                  for l in lines:
+                    let t = l.strip()
+                    if t.len == 0: continue
+                    let eq = t.find('=')
+                    let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                    if key != "FIntDebugForceMSAASamples":
+                      kept.add(t)
+
+                  if selectedIndex == 0:
+                    # Automatic: remove override
+                    discard
+                  else:
+                    let val = values[selectedIndex - 1]
+                    kept.add("FIntDebugForceMSAASamples=" & $val)
+                  app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                  app.msaaSelected = selectedIndex
+                  debug "shell: updated MSAA selection index " & $selectedIndex
+
+              ComboRow:
                 title = "Rendering API"
                 subtitle = "Choose which graphics API to prefer via FFlags."
                 items = @["Vulkan", "OpenGL", "DirectX 10", "DirectX 11"]
@@ -561,16 +628,120 @@ method view(app: vermShellState): Widget =
                     if t.len == 0: continue
                     let eq = t.find('=')
                     let key = if eq >= 0: t[0 ..< eq].strip() else: t
-                    if key != "DFIntTextureQualityOverride":
+                    if key notin ["DFIntTextureQualityOverride", "DFFlagTextureQualityOverrideEnabled"]:
                       kept.add(t)
 
                   if selectedIndex > 0:
                     let level = selectedIndex - 1
                     kept.add("DFIntTextureQualityOverride=" & $level)
+                    kept.add("DFFlagTextureQualityOverrideEnabled=true")
 
                   app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
                   app.textureQualitySelected = selectedIndex
                   debug "shell: updated texture quality override"
+
+              ActionRow:
+                title = "Disable player shadows"
+                subtitle = "Turns off dynamic shadows on characters."
+                CheckButton {.addSuffix.}:
+                  state = app.disablePlayerShadows
+
+                  proc changed(state: bool) =
+                    app.disablePlayerShadows = state
+                    var lines = app.config[].client.fflags.splitLines()
+                    var kept: seq[string] = @[]
+                    for l in lines:
+                      let t = l.strip()
+                      if t.len == 0: continue
+                      let eq = t.find('=')
+                      let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                      if key != "FIntRenderShadowIntensity":
+                        kept.add(t)
+                    if state:
+                      kept.add("FIntRenderShadowIntensity=0")
+                    app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                    debug "shell: disable player shadows set to " & $state
+
+              ActionRow:
+                title = "Disable post-processing effects"
+                subtitle = "Turns off bloom, color correction and other post effects."
+                CheckButton {.addSuffix.}:
+                  state = app.disablePostFx
+
+                  proc changed(state: bool) =
+                    app.disablePostFx = state
+                    var lines = app.config[].client.fflags.splitLines()
+                    var kept: seq[string] = @[]
+                    for l in lines:
+                      let t = l.strip()
+                      if t.len == 0: continue
+                      let eq = t.find('=')
+                      let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                      if key != "FFlagDisablePostFx":
+                        kept.add(t)
+                    if state:
+                      kept.add("FFlagDisablePostFx=true")
+                    app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                    debug "shell: disable post-processing set to " & $state
+
+              ActionRow:
+                title = "Disable terrain textures"
+                subtitle = "Replaces terrain textures with flat colors."
+                CheckButton {.addSuffix.}:
+                  state = app.disableTerrainTextures
+
+                  proc changed(state: bool) =
+                    app.disableTerrainTextures = state
+                    var lines = app.config[].client.fflags.splitLines()
+                    var kept: seq[string] = @[]
+                    for l in lines:
+                      let t = l.strip()
+                      if t.len == 0: continue
+                      let eq = t.find('=')
+                      let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                      if key notin [
+                        "FStringTerrainMaterialTable2022",
+                        "FStringTerrainMaterialTablePre2022",
+                        "FIntTerrainArraySliceSize"
+                      ]:
+                        kept.add(t)
+                    if state:
+                      kept.add("FStringTerrainMaterialTable2022=\"\"")
+                      kept.add("FStringTerrainMaterialTablePre2022=\"\"")
+                      kept.add("FIntTerrainArraySliceSize=4")
+                    app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                    debug "shell: disable terrain textures set to " & $state
+
+              ComboRow:
+                title = "Preferred lighting technology"
+                subtitle = "Choose a lighting pipeline override."
+                items = @["Chosen by game", "Voxel (Phase 1)", "Shadow Map (Phase 2)", "Future (Phase 3)"]
+                selected = app.lightingTechSelected
+
+                proc select(selectedIndex: int) =
+                  var lines = app.config[].client.fflags.splitLines()
+                  var kept: seq[string] = @[]
+                  for l in lines:
+                    let t = l.strip()
+                    if t.len == 0: continue
+                    let eq = t.find('=')
+                    let key = if eq >= 0: t[0 ..< eq].strip() else: t
+                    if key notin [
+                      "DFFlagDebugRenderForceTechnologyVoxel",
+                      "FFlagDebugForceFutureIsBrightPhase2",
+                      "FFlagDebugForceFutureIsBrightPhase3"
+                    ]:
+                      kept.add(t)
+
+                  case selectedIndex
+                  of 1: kept.add("DFFlagDebugRenderForceTechnologyVoxel=true")
+                  of 2: kept.add("FFlagDebugForceFutureIsBrightPhase2=true")
+                  of 3: kept.add("FFlagDebugForceFutureIsBrightPhase3=true")
+                  else: discard # Chosen by game – no override
+
+                  app.config[].client.fflags = (if kept.len > 0: kept.join("\n") & '\n' else: "")
+                  app.lightingTechSelected = selectedIndex
+                  debug "shell: updated preferred lighting technology"
               ComboRow:
                 title = "Backend"
                 subtitle =
@@ -688,6 +859,45 @@ proc initvermShell*(input: Input) {.inline.} =
                   sel = v + 1
               except: discard
           sel
+        ,
+        disablePlayerShadows = config.client.fflags.toLowerAscii().contains("fintrendershadowintensity=0"),
+        disablePostFx = config.client.fflags.toLowerAscii().contains("fflagdisablepostfx=true"),
+        disableTerrainTextures = block:
+          let f = config.client.fflags.toLowerAscii()
+          f.contains("fstringterrainmaterialtable2022=\"\"") or
+          f.contains("fstringterrainmaterialtablepre2022=\"\"") or
+          f.contains("fintterrainarrayslicesize=4")
+        ,
+        lightingTechSelected = block:
+          let f = config.client.fflags.toLowerAscii()
+          if f.contains("dfflagdebugrenderforcetechnologyvoxel=true"): 1
+          elif f.contains("fflagdebugforcefutureisbrightphase2=true"): 2
+          elif f.contains("fflagdebugforcefutureisbrightphase3=true"): 3
+          else: 0
+        ,
+        msaaSelected = block:
+          var idx = 0 # Automatic by default
+          let values = @[0, 1, 2, 4, 8]
+          for line in config.client.fflags.splitLines():
+            let t = line.strip()
+            if t.len == 0: continue
+            let eq = t.find('=')
+            if eq <= 0: continue
+            let key = t[0 ..< eq].strip()
+            if key == "FIntDebugForceMSAASamples":
+              let valStr = t[eq+1 .. ^1].strip()
+              try:
+                let v = parseInt(valStr)
+                for i, vv in values:
+                  if vv == v:
+                    idx = i + 1 # shift by 1 due to Automatic at index 0
+                    break
+              except: discard
+          idx
+        ,
+        gpuLightCulling = block:
+          let f = config.client.fflags.toLowerAscii()
+          f.contains("fflagnewlightattenuation=true") or f.contains("fflagfastgpulightculling3=true")
       )
     )
   )
