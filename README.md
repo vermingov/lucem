@@ -20,14 +20,17 @@ Please keep in mind that while verm is fully open source software, Sober is prop
 
 # Why choose this fork over the original?
 I have adressed and fixed alot of the issues the original has. \
-Here are some issues i have solved: \
-**stdout/stderr redirection is guarded;** \
-**failure falls back to /dev/null (prevents child attaching to terminal pipes and blocking).** \
-**Sober liveness detection now uses flatpak ps (more reliable than pidof in sandboxed setups).** \
-**Watcher advances on disconnect, won’t busy-loop, and supports a delay.** \
-**Region notifier works on each join, without overlay spam.** \
-**FFlag UI writes valid values and only touches relevant keys to avoid parse failures.** \
-**Overlay logs throttled and made less noisy.**
+Here are stability, performance, and safety updates:
+
+- Process I/O: stdout/stderr redirection is guarded; on failure we fall back to /dev/null
+- Process launch: child inherits no blocking handles (CLOEXEC), dup2 is guarded
+- Liveness checks: use `flatpak ps` instead of `pidof` in sandboxed setups
+- Bounded exec: all `flatpak` calls run with timeouts and terminate on hang
+- Watcher: advances on disconnect, supports polling delay, and avoids busy loops
+- Region notifier: triggers on every join; daemon and client fallback paths
+- FFlag safety: booleans written as lowercase; only related keys are changed
+- Overlay: debug logs throttled; overlay exits cleanly on timer/key
+- GUI: save writes immediately and confirms; rendering/texture toggles persist correctly
 
 ![A demo of verm demonstrating Discord rich presence and a notification saying where the server is located](screenshots/Bloxstrap.webp)
 
