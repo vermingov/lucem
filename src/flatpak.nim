@@ -2,11 +2,17 @@
 ## Copyright (C) 2024 Trayambak Rai
 
 import std/[os, osproc, posix, logging, strutils]
-import ./[config]
+import ./[config, common]
 
 proc flatpakInstall*(id: string, user: bool = true): bool {.inline, discardable.} =
   if findExe("flatpak").len < 1:
     error "flatpak: could not find flatpak executable! Are you sure that you have flatpak installed?"
+
+  # If Sober is already installed, skip reinstallation
+  let infoCmd = (if user: "flatpak info --user " else: "flatpak info ") & SOBER_APP_ID
+  if execCmd(infoCmd) == 0:
+    info "flatpak: '" & SOBER_APP_ID & "' is already installed; skipping install."
+    return true
 
   info "flatpak: install package \"" & id & '"'
   let (output, exitCode) =
@@ -23,7 +29,8 @@ proc flatpakInstall*(id: string, user: bool = true): bool {.inline, discardable.
     true
 
 proc soberRunning*(): bool {.inline.} =
-  execCmdEx("pidof sober").output.len > 2
+  # Prefer flatpak ps to detect the app reliably
+  execCmd("flatpak ps | grep -q " & SOBER_APP_ID) == 0
 
 proc flatpakRun*(
   id: string, path: string = "/dev/stdout", launcher: string = "",
@@ -57,6 +64,12 @@ proc flatpakRun*(
       error "verm: dup2() for stdout failed: " & $strerror(errno)
     else:
       debug "verm: dup2() successful, sober's logs are now directed at: " & path
+
+    # Also redirect stderr so Sober doesn't spam the console
+    if dup2(file, STDERR_FILENO) < 0:
+      error "verm: dup2() for stderr failed: " & $strerror(errno)
+    else:
+      debug "verm: stderr is also redirected to: " & path
 
     discard execCmd(cmd)
     debug "verm: sober has exited, forked verm process is exiting..."

@@ -148,8 +148,17 @@ proc eventWatcher*(
         )
       )
 
+      # Direct fallback notifier to ensure region is shown even if daemon isn't running
+      if config.verm.notify_server_region:
+        if (let ipinfo = getIpInfo(str); *ipinfo):
+          let data = &ipinfo
+          let msg = data.city & ", " & data.region & ", " & data.country
+          info "verm: Server Region: " & msg
+          notify("Server Region", msg, 3000)
+
     if data.contains("[FLog::Network] Client:Disconnect") or
         data.contains("[FLog::Network] Connection lost - Cannot contact server/client"):
+      inc line
       continue
 
     # sleep(config.verm.pollingDelay.int)
