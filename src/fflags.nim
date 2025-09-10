@@ -8,45 +8,47 @@ type FFlagParseError* = object of ValueError
 proc parseFFlags*(config: Config, fflags: var SoberFFlags) =
   if config.client.fflags.len > 0:
     for flag in config.client.fflags.split('\n'):
-      let splitted = flag.split('=')
+      let trimmedFlag = flag.strip()
+      if trimmedFlag.len == 0:
+        continue
+
+      # Only split on the first '=' to allow '=' in values
+      let splitted = trimmedFlag.split('=', maxsplit=1)
 
       if splitted.len < 2:
-        if flag.len > 0:
-          error "verm: error whilst parsing FFlag (" & flag &
+        if trimmedFlag.len > 0:
+          error "verm: error whilst parsing FFlag (" & trimmedFlag &
             "): only got key, no value to complete the pair was found."
           raise newException(
             FFlagParseError,
-            "Error whilst parsing FFlag (" & flag &
+            "Error whilst parsing FFlag (" & trimmedFlag &
               "). Only got key, no value to complete the pair was found.",
           )
         else:
           continue
 
-      if splitted.len > 2:
-        error "verm: error whilst parsing FFlag (" & flag &
-          "): got more than two splits, key and value were already found."
+      let
+        key = splitted[0].strip()
+        val = splitted[1].strip()
+
+      if val.len == 0:
+        error "verm: error whilst parsing FFlag (" & trimmedFlag &
+          "): value is empty."
         raise newException(
           FFlagParseError,
-          "Error whilst parsing FFlag (" & flag &
-            "). Got more than two splits, key and value were already found!",
+          "Error whilst parsing FFlag (" & trimmedFlag &
+            "). Value is empty.",
         )
 
-      let
-        key = splitted[0]
-        val = splitted[1]
-
-      if val.startsWith('"') and val.endsWith('"') or
-          val.startsWith('\'') and val.endsWith('\''):
+      if (val.startsWith('"') and val.endsWith('"')) or
+         (val.startsWith('\'') and val.endsWith('\'')):
         fflags[key] = newJString(val)
       elif val in ["true", "false"]:
         fflags[key] = newJBool(parseBool(val))
       else:
-        var allInt = false
-
+        var allInt = true
         for c in val:
-          if c in {'0' .. '9'}:
-            allInt = true
-          else:
+          if c notin {'0' .. '9'}:
             allInt = false
             break
 

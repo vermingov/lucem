@@ -63,6 +63,7 @@ viewable vermShell:
   pollingDelayBuff:
     string
 
+# This method builds and returns the main GUI for the verm shell, handling all state and user interactions.
 method view(app: vermShellState): Widget =
   var parsedFflags: SoberFFlags
   try:
@@ -90,6 +91,7 @@ method view(app: vermShellState): Widget =
           text = "Features"
           tooltip = "The features provided by verm"
 
+          # Switches to the verm features page
           proc clicked() =
             app.state = ShellState.verm
 
@@ -99,6 +101,7 @@ method view(app: vermShellState): Widget =
           text = "Client"
           tooltip = "Basic settings for Sober (e.g. framerate cap)"
 
+          # Switches to the client settings page
           proc clicked() =
             app.state = ShellState.Client
 
@@ -108,6 +111,7 @@ method view(app: vermShellState): Widget =
           text = "Tweaks"
           tooltip = "Restore the Oof sound, use custom fonts and more"
 
+          # Switches to the tweaks page
           proc clicked() =
             app.state = ShellState.Tweaks
 
@@ -117,6 +121,7 @@ method view(app: vermShellState): Widget =
           text = "FFlags"
           tooltip = "Add and remove FFlags easily"
 
+          # Switches to the FFlag editor page
           proc clicked() =
             app.state = ShellState.FflagEditor
 
@@ -125,6 +130,7 @@ method view(app: vermShellState): Widget =
           icon = "media-floppy-symbolic" # floppy disk as a save icon (system icon)
           tooltip = "Save the modified configuration"
 
+          # Saves the current configuration to disk
           proc clicked() =
             debug "shell: updated configuration file"
             app.config[].save()
@@ -134,6 +140,7 @@ method view(app: vermShellState): Widget =
           icon = "bookmark-new-symbolic"
           tooltip = "Add desktop entries for verm"
 
+          # Creates .desktop files for verm
           proc clicked() =
             debug "shell: created .desktop files"
             createvermDesktopFile()
@@ -143,6 +150,7 @@ method view(app: vermShellState): Widget =
           icon = "input-gaming-symbolic"
           tooltip = "Save configuration and launch Sober through verm"
 
+          # Saves config, closes the window, and launches Sober through verm
           proc clicked() =
             debug "shell: save config, exit config editor and launch verm"
             app.config[].save()
@@ -173,6 +181,7 @@ method view(app: vermShellState): Widget =
                 CheckButton {.addSuffix.}:
                   state = app.oldOofSound
 
+                  # Toggles the "Oof" sound option and updates config
                   proc changed(state: bool) =
                     app.oldOofSound = not app.oldOofSound
                     app.config[].tweaks.oldOof = app.oldOofSound
@@ -187,10 +196,12 @@ method view(app: vermShellState): Widget =
                 Entry {.addSuffix.}:
                   text = app.customFontPath
 
+                  # Updates the custom font path buffer
                   proc changed(text: string) =
                     debug "shell: custom font entry changed: " & text
                     app.customFontPath = text
 
+                  # Validates and sets the custom font path in config
                   proc activate() =
                     let font = app.customFontPath.expandTilde()
                     if font.len > 0 and not isAccessible(font):
@@ -209,10 +220,12 @@ method view(app: vermShellState): Widget =
                   text = app.sunImgPath
                   placeholder = ""
 
+                  # Updates the sun image path buffer
                   proc changed(text: string) =
                     debug "shell: sun image entry changed: " & text
                     app.sunImgPath = text
 
+                  # Validates and sets the sun texture path in config
                   proc activate() =
                     let path = app.sunImgPath.expandTilde()
                     if path.len > 0 and not isAccessible(path):
@@ -231,10 +244,12 @@ method view(app: vermShellState): Widget =
                   text = app.moonImgPath
                   placeholder = ""
 
+                  # Updates the moon image path buffer
                   proc changed(text: string) =
                     debug "shell: moon image entry changed: " & text
                     app.moonImgPath = text
 
+                  # Validates and sets the moon texture path in config
                   proc activate() =
                     let path = app.moonImgPath.expandTilde()
                     if path.len > 0 and not isAccessible(path):
@@ -249,7 +264,7 @@ method view(app: vermShellState): Widget =
 
             PreferencesGroup:
               sizeRequest = (760, 560)
-              title = "verm Settings"
+              title = "Verm Settings"
               description =
                 "These are settings to tweak the features that verm provides."
 
@@ -260,6 +275,7 @@ method view(app: vermShellState): Widget =
                 CheckButton {.addSuffix.}:
                   state = app.discordRpcOpt
 
+                  # Toggles Discord RPC option and updates config
                   proc changed(state: bool) =
                     app.discordRpcOpt = not app.discordRpcOpt
                     app.config[].verm.discordRpc = app.discordRpcOpt
@@ -274,6 +290,7 @@ method view(app: vermShellState): Widget =
                 CheckButton {.addSuffix.}:
                   state = app.serverLocationOpt
 
+                  # Toggles server region notification and updates config
                   proc changed(state: bool) =
                     app.serverLocationOpt = not app.serverLocationOpt
                     app.config[].verm.notifyServerRegion = app.serverLocationOpt
@@ -289,6 +306,7 @@ method view(app: vermShellState): Widget =
                   icon = "user-trash-symbolic"
                   style = [ButtonDestructive]
 
+                  # Clears all API caches and notifies the user
                   proc clicked() =
                     let savedMb = clearCache()
                     info "shell: cleared out cache and reclaimed " & $savedMb &
@@ -310,10 +328,12 @@ method view(app: vermShellState): Widget =
                     text = app.currFflagBuff
                     placeholder = "Key=Value"
 
+                    # Updates the FFlag entry buffer
                     proc changed(text: string) =
                       app.currFflagBuff = text
                       debug "shell: fflag entry mutated: " & app.currFflagBuff
 
+                    # Adds the FFlag entry to the config (no validation yet)
                     proc activate() =
                       debug "shell: fflag entry: " & app.currFflagBuff
 
@@ -324,6 +344,7 @@ method view(app: vermShellState): Widget =
                     icon = "list-add-symbolic"
                     style = [ButtonSuggested]
 
+                    # Adds the FFlag entry to the config (no validation yet)
                     proc clicked() =
                       # TODO: add validation
                       app.config[].client.fflags &= '\n' & app.currFflagBuff
@@ -355,33 +376,32 @@ method view(app: vermShellState): Widget =
                             icon = "list-remove-symbolic"
                             style = [ButtonDestructive]
 
+                            # Removes the selected FFlag from the config
                             proc clicked() =
-                              # FIXME: move the line selection and deletion code to src/fflags.nim! this is a total mess!
                               debug "shell: deleting fflag: " & key
                               app.prevFflagBuff = app.currFflagBuff
 
                               var
-                                i = -1
-                                line = -1
-                                fflags =
-                                  app.config[].client.fflags.splitLines().deepCopy()
+                                fflags = app.config[].client.fflags.splitLines()
+                                newFflags: seq[string] = @[]
 
-                              for l in app.config[].client.fflags.splitLines():
-                                inc i
-                                if l.startsWith(key):
-                                  line = i
-                                  break
+                              for l in fflags:
+                                # Only remove the line if it matches the key exactly (before the first '=')
+                                let eqIdx = l.find('=')
+                                if eqIdx != -1:
+                                  let k = l[0 ..< eqIdx].strip()
+                                  if k != key and l.strip().len > 0:
+                                    newFflags.add(l)
+                                else:
+                                  # If the line doesn't contain '=', keep it (or skip? safer to keep)
+                                  if l.strip().len > 0:
+                                    newFflags.add(l)
 
-                              assert line != -1,
-                                "Cannot find line at which key \"" & key & "\" is defined!"
-                              debug "shell: config key to delete is at line " & $line
-                              fflags.del(line)
-
-                              app.config[].client.fflags = newString(0)
-                              for i, line in fflags:
-                                app.config[].client.fflags &= line
-                                if i >= fflags.len - 1:
-                                  app.config[].client.fflags &= '\n'
+                              # Rebuild the fflags string, joining with '\n'
+                              if newFflags.len > 0:
+                                app.config[].client.fflags = newFflags.join("\n") & '\n'
+                              else:
+                                app.config[].client.fflags = ""
 
         of ShellState.Client:
           PreferencesPage:
@@ -390,7 +410,6 @@ method view(app: vermShellState): Widget =
               sizeRequest = (760, 560)
               title = "Client Settings"
               description = "These settings are mostly applied via FFlags."
-
               ActionRow:
                 title = "Disable Telemetry"
                 subtitle =
@@ -398,6 +417,7 @@ method view(app: vermShellState): Widget =
                 CheckButton {.addSuffix.}:
                   state = app.telemetryOpt
 
+                  # Toggles telemetry option and updates config
                   proc changed(state: bool) =
                     app.telemetryOpt = not app.telemetryOpt
                     app.config[].client.telemetry = app.telemetryOpt
@@ -410,6 +430,7 @@ method view(app: vermShellState): Widget =
                 CheckButton {.addSuffix.}:
                   state = app.showFpsCapOpt
 
+                  # Toggles FPS cap option and updates config
                   proc changed(state: bool) =
                     app.showFpsCapOpt = not app.showFpsCapOpt
                     app.config[].client.fps = if state: 60 else: 60
@@ -417,7 +438,6 @@ method view(app: vermShellState): Widget =
                     debug "shell: disable/enable fps cap button state: " &
                       $app.showFpsCapOpt
                     debug "shell: fps is now set to: " & $app.config[].client.fps
-
               if app.showFpsCapOpt:
                 ActionRow:
                   title = "FPS Cap"
@@ -426,10 +446,12 @@ method view(app: vermShellState): Widget =
                     text = app.showFpsCapBuff
                     placeholder = "e.g. 30, 60 (default), 144, etc."
 
+                    # Updates the FPS cap buffer
                     proc changed(text: string) =
                       debug "shell: fps cap entry changed: " & text
                       app.showFpsCapBuff = text
 
+                    # Parses and sets the FPS cap value in config
                     proc activate() =
                       try:
                         debug "shell: parse fps cap buffer as integer: " &
@@ -449,10 +471,12 @@ method view(app: vermShellState): Widget =
                 items = app.backendOpt
                 selected = app.backendBuff
 
+                # Updates the selected backend buffer
                 proc select(selectedIndex: int) =
                   debug "shell: launcher entry changed: " & app.backendOpt[selectedIndex]
                   app.backendBuff = selectedIndex
 
+                # Sets the backend in config
                 proc activate() =
                   app.config[].client.backend = app.backendOpt[app.backendBuff]
                   debug "shell: backend is set to: " & app.backendOpt[app.backendBuff]
@@ -465,10 +489,12 @@ method view(app: vermShellState): Widget =
                   text = app.launcherBuff
                   placeholder = "e.g. gamemoderun"
 
+                  # Updates the launcher buffer
                   proc changed(text: string) =
                     debug "shell: launcher entry changed: " & text
                     app.launcherBuff = text
 
+                  # Sets the launcher command in config
                   proc activate() =
                     app.config[].client.launcher = app.launcherBuff
                     debug "shell: launcher is set to: " & app.launcherBuff
@@ -482,10 +508,12 @@ method view(app: vermShellState): Widget =
                   text = app.pollingDelayBuff
                   placeholder = "100 is sufficient for most modern systems"
 
+                  # Updates the polling delay buffer
                   proc changed(text: string) =
                     debug "shell: polling delay entry changed: " & text
                     app.pollingDelayBuff = text
 
+                  # Parses and sets the polling delay in config
                   proc activate() =
                     try:
                       app.config[].verm.pollingDelay = app.pollingDelayBuff.parseUint()
@@ -501,10 +529,12 @@ method view(app: vermShellState): Widget =
                 CheckButton {.addSuffix.}:
                   state = app.automaticApkUpdates
 
+                  # Toggles automatic APK updates and updates config
                   proc changed(state: bool) =
                     app.automaticApkUpdates = state
                     app.config[].client.apkUpdates = state
 
+# Initializes the verm shell GUI, loads config, and starts the main event loop.
 proc initvermShell*(input: Input) {.inline.} =
   info "shell: initializing GTK4 shell"
   info "shell: libadwaita version: v" & $AdwVersion[0] & '.' & $AdwVersion[1]

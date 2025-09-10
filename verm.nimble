@@ -27,8 +27,8 @@ after install:
   exec "$HOME/.nimble/bin/verm init"
 
   echo "\e[1mPssst, hey you!\e[0m"
-  echo "\e[1;34mYes, you!\e[0m"
-  echo "\e[1mThanks for installing verm!"
+  echo "\e[1;34mYes, you buddy!\e[0m"
+  echo "\e[1mThanks for installing Verm!"
   echo "If you run `verm` in the terminal and no command is found, try running the command below:\e[0m"
   echo "\e[1:32mexport PATH=\"$HOME/.nimble/bin:$PATH\"\e[0m"
 
