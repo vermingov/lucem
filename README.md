@@ -110,11 +110,11 @@ Debian ships an old version of Nim that is not compatible with verm, install Nim
 
 #### Ubuntu
 ```command
-# sudo apt update
-# sudo apt install -y libgtk-4-1 libgtk-4-dev libadwaita-1-0 libadwaita-1-dev libcurl4-openssl-dev git build-essential
-# curl https://nim-lang.org/choosenim/init.sh -sSf | sh
-# choosenim stable
-# nim -v
+sudo apt update
+sudo apt install -y libgtk-4-1 libgtk-4-dev libadwaita-1-0 libadwaita-1-dev libcurl4-openssl-dev git build-essential
+curl https://nim-lang.org/choosenim/init.sh -sSf | sh
+choosenim stable
+nim -v
 ```
 
 #### NixOS
@@ -127,7 +127,7 @@ $ nix-shell
 
 The package names are similar for other distributions.
 
-#### Dependency Errors?
+#### Dependency Errors
 You might encounter Dependency Version errors, this should fix that.
 ```command
 # nimble refresh; rm -rf ~/.nimble/pkgcache ~/.nimble/pkgs2/{owlkettle,nanovg,nimgl,x11,curly,zippy,pretty,semver,jsony,toml_serialization}
