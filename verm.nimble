@@ -10,10 +10,10 @@ bin = @["verm", "vermd", "verm_overlay"]
 
 # Dependencies
 
-requires "nim >= 2.0.0"
+requires "nim >= 2.0.6"
 requires "colored_logger >= 0.1.0"
 requires "jsony >= 1.1.5"
-requires "toml_serialization >= 0.2.16"
+requires "toml_serialization >= 0.2.14"
 requires "pretty >= 0.1.0"
 requires "owlkettle >= 3.0.0"
 requires "nimgl >= 1.3.2"
