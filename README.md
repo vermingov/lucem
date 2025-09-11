@@ -130,8 +130,8 @@ The package names are similar for other distributions.
 #### Dependency Errors
 You might encounter Dependency Version errors, this should fix that.
 ```command
-# nimble refresh; rm -rf ~/.nimble/pkgcache ~/.nimble/pkgs2/{owlkettle,nanovg,nimgl,x11,curly,zippy,pretty,semver,jsony,toml_serialization}
-# nimble install owlkettle@#3.0.0 toml_serialization@#0.2.14 nimgl@#1.3.2 nanovg@#v0.4.0 x11@#1.2 curly@#1.1.1 zippy@#0.10.16 pretty@#0.2.0 semver@#v1.2.3 jsony@#1.1.5
+nimble refresh; rm -rf ~/.nimble/pkgcache ~/.nimble/pkgs2/{owlkettle,nanovg,nimgl,x11,curly,zippy,pretty,semver,jsony,toml_serialization}
+nimble install owlkettle@#3.0.0 toml_serialization@#0.2.14 nimgl@#1.3.2 nanovg@#v0.4.0 x11@#1.2 curly@#1.1.1 zippy@#0.10.16 pretty@#0.2.0 semver@#v1.2.3 jsony@#1.1.5
 ```
 
 Run the following command to compile verm.
