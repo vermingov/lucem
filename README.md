@@ -87,11 +87,6 @@ backend = "x11" # or "wayland", "wl". This is case insensitive.
 ```
 
 ## Installation
-### AUR
-If you use Arch, you can install verm directly from the [AUR](https://aur.archlinux.org/packages/verm-git) using
-```command
-# yay -S verm-git
-```
 
 ### Building from source
 You will need the following dependencies to compile verm:
@@ -113,6 +108,15 @@ You can get nim from the [Terra](https://terra.fyralabs.com/) repository
 ```
 Debian ships an old version of Nim that is not compatible with verm, install Nim [here](https://nim-lang.org/install_unix.html)
 
+#### Ubuntu
+```command
+# sudo apt update
+# sudo apt install -y libgtk-4-1 libgtk-4-dev libadwaita-1-0 libadwaita-1-dev libcurl4-openssl-dev git build-essential
+# curl https://nim-lang.org/choosenim/init.sh -sSf | sh
+# choosenim stable
+# nim -v
+```
+
 #### NixOS
 There's no Nix flake yet.
 ```command
@@ -122,6 +126,13 @@ $ nix-shell
 ```
 
 The package names are similar for other distributions.
+
+#### Dependency Errors?
+You might encounter Dependency Version errors, this should fix that.
+```command
+# nimble refresh; rm -rf ~/.nimble/pkgcache ~/.nimble/pkgs2/{owlkettle,nanovg,nimgl,x11,curly,zippy,pretty,semver,jsony,toml_serialization}
+# nimble install owlkettle@#3.0.0 toml_serialization@#0.2.14 nimgl@#1.3.2 nanovg@#v0.4.0 x11@#1.2 curly@#1.1.1 zippy@#0.10.16 pretty@#0.2.0 semver@#v1.2.3 jsony@#1.1.5
+```
 
 Run the following command to compile verm.
 ```command
