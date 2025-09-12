@@ -8,10 +8,10 @@ const SOBER_FLATPAK_URL* {.strdefine: "SoberFlatpakUrl".} =
   "https://sober.vinegarhq.org/sober.flatpakref"
 
 proc initializeSober*(input: Input) {.inline.} =
-  info "verm: initializing sober"
+  info "verm: Initializing Sober"
 
   if not flatpakInstall(SOBER_FLATPAK_URL):
-    error "verm: failed to initialize sober."
+    error "verm: Failed to initialize Sober."
     quit(1)
 
   info "verm: Installed Sober successfully!"
