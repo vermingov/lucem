@@ -11,7 +11,7 @@ proc parseFFlags*(config: Config, fflags: var SoberFFlags) =
       let trimmedFlag = flag.strip()
       if trimmedFlag.len == 0:
         continue
-
+ 
       # Only split on the first '=' to allow '=' in values
       let splitted = trimmedFlag.split('=', maxsplit=1)
 
