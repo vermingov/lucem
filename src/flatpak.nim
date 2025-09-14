@@ -4,8 +4,9 @@
 import std/[os, osproc, posix, logging, strutils, times]
 import ./[config, common]
 proc runCmdExitCodeTimeout(cmd: string, timeoutMs: int): int {.inline.} =
+  var p: Process
   try:
-    var p = startProcess(
+    p = startProcess(
       command = "/bin/sh",
       args = @["-lc", cmd],
       options = {poUsePath, poStdErrToStdOut}
@@ -23,6 +24,12 @@ proc runCmdExitCodeTimeout(cmd: string, timeoutMs: int): int {.inline.} =
   except CatchableError as exc:
     warn "flatpak: command failed ('" & cmd & "'): " & exc.msg
     return -1
+  finally:
+    try:
+      if p != nil:
+        close(p)
+    except CatchableError:
+      discard
 
 ## simplified bounded runner: returns only exit code
 
@@ -100,6 +107,10 @@ proc flatpakRun*(
       error "verm: dup2() for stderr failed: " & $strerror(errno)
     else:
       debug "verm: stderr is also redirected to: " & path
+
+    # Close the original file descriptor after duplicating it
+    if file >= 0:
+      discard posix.close(file)
 
     discard execCmd(cmd)
     debug "verm: sober has exited, forked verm process is exiting..."
